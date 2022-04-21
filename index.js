@@ -3,10 +3,17 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 const bodyParser = require("body-parser");
-app.use(bodyParser.json());
+app.use(express.json());
 
-let database = [];
+let database = Array();
 let id = 0;
+database.push({
+  id,
+  movie: {
+    Email: "jaron@jaron.jaron",
+    Password: "password45",
+  },
+});
 
 app.all("*", (req, res, next) => {
   const method = req.method;
@@ -17,48 +24,33 @@ app.all("*", (req, res, next) => {
 app.get("/", (req, res) => {
   res.status(200).json({
     status: 200,
-    result: "Hello World",
+    result: "Share a meal app",
   });
 });
 
-app.post("/api/movie", (req, res) => {
-  let movie = req.body;
+app.post("/api/user", function (req, res) {
+  let user = req.body;
   id++;
-  movie = {
+  database.push({
     id,
-    ...movie,
-  };
-  console.log(movie);
-  database.push(movie);
-  res.status(201).json({
-    status: 201,
-    result: database,
+    user
   });
+  res.json(user);
+  console.log(user);
 });
 
-app.get("/api/movie/:movieId", (req, res, next) => {
-  const movieId = req.params.movieId;
-  console.log(`Movie met ID ${movieId} gezocht`);
-  let movie = database.filter((item) => item.id == movieId);
-  if (movie.length > 0) {
-    console.log(movie);
-    res.status(200).json({
-      status: 200,
-      result: movie,
-    });
-  } else {
-    res.status(401).json({
-      status: 401,
-      result: `Movie with ID ${movieId} not found`,
-    });
+app.put("/api/user/:userId", function (req, res) {
+  const userID = req.params.userId;
+  let user = req.body;
+  const selectedUser = database.filter((item) => item.id == userID)
+  if(selectedUser.length> 0){
+    database[userID] = user
   }
+  res.send(database[userID])
 });
 
-app.get("/api/movie", (req, res, next) => {
-  res.status(200).json({
-    status: 200,
-    result: database,
-  });
+app.get("/api/user", function (req, res) {
+  res.send(database)
 });
 
 app.all("*", (req, res) => {
