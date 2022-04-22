@@ -33,5 +33,5 @@ app.all("*", (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Example app listening on http://localhost:${port}`);
+  console.log(`app listening on http://localhost:${port}`);
 });
