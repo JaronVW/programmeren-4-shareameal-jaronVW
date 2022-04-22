@@ -52,15 +52,38 @@ router.get("/:userId", function (req, res) {
 router.put("/:userId", function (req, res) {
   const userID = req.params.userId;
   let user = req.body;
-  const emailAdress = req.body.emailAdress;
-
-  try{
-    
-  }catch(Exception){
+  try {
+    const selectedUser = database.filter((item) => item.id == userID);
+    if (selectedUser.length > 0) {
+      user = { id: userID, ...user };
+      database[userID] = user;
+    }
+    res.send(database[userID]);
+  } catch (Exception) {
     res.status(400).json({
-        Status: 400,
-        Message: `body does not emailAdress field`,
+      Status: 400,
+      Message: `body does not contain emailAdress field`,
+    });
+  }
+});
+
+router.delete("/:userId", function (req, res) {
+  const userID = req.params.userId;
+  let user = req.body;
+  try {
+    const selectedUser = database.filter((item) => item.id == userID);
+    if (selectedUser.length > 0) {
+      database.splice(userID, 1);
+    }
+    res.status(200).json({
+        Status: 200,
+        Message: `User succesfully deleted!`,
       });
+  } catch (Exception) {
+    res.status(400).json({
+      Status: 400,
+      Message: `body does not contain emailAdress field`,
+    });
   }
 });
 
