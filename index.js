@@ -1,19 +1,12 @@
 const express = require("express");
 const app = express();
 const port = process.env.PORT || 3000;
-
-const bodyParser = require("body-parser");
 app.use(express.json());
 
-let database = Array();
-let id = 0;
-database.push({
-  id,
-  movie: {
-    Email: "jaron@jaron.jaron",
-    Password: "password45",
-  },
-});
+
+app.use("/api/user", require("./routes/user-router")) 
+
+
 
 app.all("*", (req, res, next) => {
   const method = req.method;
@@ -28,30 +21,7 @@ app.get("/", (req, res) => {
   });
 });
 
-app.post("/api/user", function (req, res) {
-  let user = req.body;
-  id++;
-  database.push({
-    id,
-    user
-  });
-  res.json(user);
-  console.log(user);
-});
 
-app.put("/api/user/:userId", function (req, res) {
-  const userID = req.params.userId;
-  let user = req.body;
-  const selectedUser = database.filter((item) => item.id == userID)
-  if(selectedUser.length> 0){
-    database[userID] = user
-  }
-  res.send(database[userID])
-});
-
-app.get("/api/user", function (req, res) {
-  res.send(database)
-});
 
 app.all("*", (req, res) => {
   res.status(401).json({
