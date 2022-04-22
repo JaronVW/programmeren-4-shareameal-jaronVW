@@ -91,4 +91,11 @@ router.get("/", function (req, res) {
   res.send(database);
 });
 
+router.get("/profile", function (req, res) {
+  res.status(200).json({
+    Status: 200,
+    Message: `Requires JWT implementation, still in progress`,
+  });
+});
+
 module.exports = router;
