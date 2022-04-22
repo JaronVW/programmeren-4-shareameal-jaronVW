@@ -1,44 +1,67 @@
 const router = require("express").Router();
 
-let database = Array();
-let id = 0;
+let database = [];
+let databaseID = database.length;
 
 database.push({
-  id,
-  movie: {
-    Email: "jaron@jaron.jaron",
-    Password: "password45",
-  },
+  id: databaseID,
+  firstName: "John",
+  lastName: "Doe",
+  street: "Lovensdijkstraat 61",
+  city: "Breda",
+  isActive: true,
+  emailAdress: "j.doe@server.com",
+  password: "secret",
+  phoneNumber: "06 12425475",
 });
 
 router.post("/", function (req, res) {
-  let user = req.body;
-  let email = user.emailAdress;
+  const user = req.body;
+  const emailAdress = req.body.emailAdress;
 
-  if (database.filter((item) => item.emailAdress == email).length > 0) {
+  if (emailAdress != null) {
+    if (database.filter((item) => item.emailAdress == emailAdress).length > 0) {
+      res.status(400).json({
+        Status: 400,
+        Message: `A user with this Email adress already exists!`,
+      });
+    } else {
+      databaseID++;
+      database.push({
+        id: databaseID,
+        ...user,
+      });
+      res.json(database.filter((item) => item.emailAdress == emailAdress));
+    }
+  } else {
     res.status(400).json({
       Status: 400,
-      Message: `An user with this Email adress already exists!`,
+      Message: `body does not emailAdress field`,
     });
-  } else {
-    id++;
-    database.push({
-      id,
-      user,
-    });
-    res.json(user);
-    console.log(user);
+  }
+});
+
+router.get("/:userId", function (req, res) {
+  const userID = req.params.userId;
+  const selectedUser = database.filter((item) => item.id == userID);
+  if (selectedUser.length > 0) {
+    res.send(database[userID]);
   }
 });
 
 router.put("/:userId", function (req, res) {
   const userID = req.params.userId;
   let user = req.body;
-  const selectedUser = database.filter((item) => item.id == userID);
-  if (selectedUser.length > 0) {
-    database[userID] = user;
+  const emailAdress = req.body.emailAdress;
+
+  try{
+    
+  }catch(Exception){
+    res.status(400).json({
+        Status: 400,
+        Message: `body does not emailAdress field`,
+      });
   }
-  res.send(database[userID]);
 });
 
 router.get("/", function (req, res) {

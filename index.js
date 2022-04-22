@@ -3,10 +3,12 @@ const app = express();
 const port = process.env.PORT || 3000;
 app.use(express.json());
 
+const userRouter = require("./routes/user-router");
 
-app.use("/api/user", require("./routes/user-router")) 
 
 
+
+app.use("/api/user", userRouter)
 
 app.all("*", (req, res, next) => {
   const method = req.method;
