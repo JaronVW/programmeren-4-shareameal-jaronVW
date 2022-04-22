@@ -15,6 +15,7 @@ database.push({
   phoneNumber: "06 12425475",
 });
 
+// adds a user
 router.post("/", function (req, res) {
   const user = req.body;
   const emailAdress = req.body.emailAdress;
@@ -36,11 +37,12 @@ router.post("/", function (req, res) {
   } else {
     res.status(400).json({
       Status: 400,
-      Message: `body does not emailAdress field`,
+      Message: `body does not contain emailAdress field`,
     });
   }
 });
 
+// selects a specific user
 router.get("/:userId", function (req, res) {
   const userID = req.params.userId;
   const selectedUser = database.filter((item) => item.id == userID);
@@ -49,24 +51,33 @@ router.get("/:userId", function (req, res) {
   }
 });
 
+// updates a user
 router.put("/:userId", function (req, res) {
+  let email = req.body.emailAdress;
   const userID = req.params.userId;
   let user = req.body;
-  try {
-    const selectedUser = database.filter((item) => item.id == userID);
-    if (selectedUser.length > 0) {
+
+  let item = database.filter((item) => item.emailAdress == email);
+  if (item.length > 0) {
+    if (req.params.userId != item[0].id) {
+      res.status(400).json({
+        Status: 400,
+        Message: `Email already used!`,
+      });
+    } else {
       user = { id: userID, ...user };
       database[userID] = user;
+      res.send(database[userID]);
     }
+  } else {
+    user = { id: userID, ...user };
+    database[userID] = user;
     res.send(database[userID]);
-  } catch (Exception) {
-    res.status(400).json({
-      Status: 400,
-      Message: `body does not contain emailAdress field`,
-    });
   }
 });
 
+
+// deletes a user
 router.delete("/:userId", function (req, res) {
   const userID = req.params.userId;
   let user = req.body;
@@ -76,9 +87,9 @@ router.delete("/:userId", function (req, res) {
       database.splice(userID, 1);
     }
     res.status(200).json({
-        Status: 200,
-        Message: `User succesfully deleted!`,
-      });
+      Status: 200,
+      Message: `User succesfully deleted!`,
+    });
   } catch (Exception) {
     res.status(400).json({
       Status: 400,
@@ -87,10 +98,12 @@ router.delete("/:userId", function (req, res) {
   }
 });
 
+// gets all users
 router.get("/", function (req, res) {
   res.send(database);
 });
 
+// beginning route of profile details
 router.get("/profile", function (req, res) {
   res.status(200).json({
     Status: 200,
