@@ -1,5 +1,6 @@
 let database = [];
 let databaseID = database.length;
+const assert = require("assert");
 
 database.push({
   id: databaseID,
@@ -14,6 +15,35 @@ database.push({
 });
 
 const controller = {
+  validateUser: (req, res) => {
+    let user = req.body;
+
+    let {
+      firstName,
+      lastName,
+      street,
+      city,
+      isActive,
+      emailAdress,
+      password,
+      phoneNumber,
+    } = user;
+
+    try {
+      assert(typeof firstName == "string", "first name must be a string");
+      assert(typeof lastName == "string", "last name must be a string");
+      assert(typeof emailAdress == "string", "email must be a string");
+      assert(typeof password == "string", "password must be a string");
+      next();
+    } catch (err) {
+      console.log(err);
+      res.status(400).json({
+        Status: 400,
+        Message: "request body does is incorrect",
+      });
+    }
+  },
+
   addMovie: (req, res) => {
     const user = req.body;
     const emailAdress = req.body.emailAdress;
@@ -37,7 +67,7 @@ const controller = {
     } else {
       res.status(400).json({
         Status: 400,
-        Message: `body does not emailAdress field`,
+        Message: `body does not contain emailAdress field`,
       });
     }
   },
