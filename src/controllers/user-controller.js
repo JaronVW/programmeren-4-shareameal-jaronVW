@@ -47,7 +47,11 @@ const controller = {
   addUser: (req, res) => {
     const user = req.body;
     const emailAdress = req.body.emailAdress;
-
+    const error = {
+      status: 400,
+      Message: `body does not contain emailAdress field`,
+    };
+    
     if (emailAdress != null) {
       if (
         database.filter((item) => item.emailAdress == emailAdress).length > 0
@@ -69,6 +73,7 @@ const controller = {
         Status: 400,
         Message: `body does not contain emailAdress field`,
       });
+      next(err);
     }
   },
 

@@ -5,8 +5,6 @@ app.use(express.json());
 
 const userRouter = require("./routes/user-router");
 
-
-
 app.all("*", (req, res, next) => {
   const method = req.method;
   console.log(`Method ${method} is aangeroepen`);
@@ -27,6 +25,10 @@ app.all("*", (req, res) => {
     status: 401,
     result: "End-point not found",
   });
+});
+
+app.use((err, req, res) => {
+  res.status(err.status).json(err);
 });
 
 app.listen(port, () => {
