@@ -7,9 +7,6 @@ const userRouter = require("./routes/user-router");
 
 
 
-
-app.use("/api/user", userRouter)
-
 app.all("*", (req, res, next) => {
   const method = req.method;
   console.log(`Method ${method} is aangeroepen`);
@@ -23,7 +20,7 @@ app.get("/", (req, res) => {
   });
 });
 
-
+app.use("/api/user", userRouter);
 
 app.all("*", (req, res) => {
   res.status(401).json({
