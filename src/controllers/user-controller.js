@@ -39,12 +39,12 @@ const controller = {
       console.log(err);
       res.status(400).json({
         Status: 400,
-        Message: "request body does is incorrect",
+        Message: "request body is incorrect",
       });
     }
   },
 
-  addMovie: (req, res) => {
+  addUser: (req, res) => {
     const user = req.body;
     const emailAdress = req.body.emailAdress;
 
@@ -72,7 +72,7 @@ const controller = {
     }
   },
 
-  getMovieById: (req, res) => {
+  getUserById: (req, res) => {
     const userID = req.params.userId;
     const selectedUser = database.filter((item) => item.id == userID);
     if (selectedUser.length > 0) {
@@ -85,7 +85,7 @@ const controller = {
     }
   },
 
-  editMovie: (req, res) => {
+  editUser: (req, res) => {
     const userID = req.params.userId;
 
     let user = req.body;
@@ -109,7 +109,7 @@ const controller = {
     }
   },
 
-  deleteMovie: (req, res) => {
+  deleteUser: (req, res) => {
     const userID = req.params.userId;
     let user = req.body;
     try {
