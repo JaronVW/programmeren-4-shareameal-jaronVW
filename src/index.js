@@ -1,15 +1,17 @@
 const express = require("express");
 const app = express();
-const port = process.env.PORT || 3000;
 app.use(express.json());
+require("dotenv").config()
+
+const port = process.env.PORT;
 
 const userRouter = require("./routes/user-router");
 
-app.all("*", (req, res, next) => {
-  const method = req.method;
-  console.log(`Method ${method} is aangeroepen`);
-  next();
-});
+// app.all("*", (req, res, next) => {
+//   const method = req.method;
+//   console.log(`Method ${method} is aangeroepen`);
+//   next();
+// });
 
 app.get("/", (req, res) => {
   res.status(200).json({
