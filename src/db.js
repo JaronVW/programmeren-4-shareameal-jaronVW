@@ -1,7 +1,7 @@
 require("dotenv").config();
 let mysql = require("mysql2");
 
-const databasePool = mysql.createPool({
+const Database = mysql.createPool({
   connectionLimit: 10,
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
@@ -12,10 +12,4 @@ const databasePool = mysql.createPool({
 
 
 
-
-databasePool.end((err) => {
-  if (err) {
-    console.log(err);
-  }
-  console.log("pool closed");
-});
+module.exports = Database;

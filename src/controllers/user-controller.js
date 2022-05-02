@@ -1,18 +1,5 @@
-let database = [];
-let databaseID = database.length;
+const Database = require("../db");
 const assert = require("assert");
-
-database.push({
-  id: databaseID,
-  firstName: "John",
-  lastName: "Doe",
-  street: "Lovensdijkstraat 61",
-  city: "Breda",
-  isActive: true,
-  emailAdress: "j.doe@server.com",
-  password: "secret",
-  phoneNumber: "06 12425475",
-});
 
 const controller = {
   validateUser: (req, res) => {
@@ -21,12 +8,8 @@ const controller = {
     let {
       firstName,
       lastName,
-      street,
-      city,
-      isActive,
       emailAdress,
       password,
-      phoneNumber,
     } = user;
 
     try {
@@ -46,101 +29,137 @@ const controller = {
 
   addUser: (req, res) => {
     const user = req.body;
-    const emailAdress = req.body.emailAdress;
-    const error = {
-      status: 400,
-      Message: `body does not contain emailAdress field`,
-    };
-    
-    if (emailAdress != null) {
-      if (
-        database.filter((item) => item.emailAdress == emailAdress).length > 0
-      ) {
-        res.status(400).json({
-          Status: 400,
-          Message: `A user with this Email adress already exists!`,
-        });
-      } else {
-        databaseID++;
-        database.push({
-          id: databaseID,
-          ...user,
-        });
-        res.json(database.filter((item) => item.emailAdress == emailAdress));
+    Database.query(
+      "INSERT INTO user (firstName,lastName,isActive,emailAdress,password,phoneNumber,street,city) VALUES(?,?,?,?,?,?,?,?)",
+      [
+        user.firstName,
+        user.lastName,
+        user.isActive,
+        user.emailAdress,
+        user.password,
+        user.phoneNumber,
+        user.street,
+        user.city,
+      ],
+      (err, rows, fields) => {
+        if (err) {
+          if (err.code == "ER_DUP_ENTRY") {
+            res.status(400).json({
+              Status: 400,
+              Message: `Email already exists`,
+            });
+          } else {
+            res.status(400).json({
+              Status: 400,
+              Message: `Something went wrong`,
+            });
+          }
+        } else {
+          res.status(200).json({
+            Status: 200,
+            Message: `User succesfully added!`,
+          });
+        }
       }
-    } else {
-      res.status(400).json({
-        Status: 400,
-        Message: `body does not contain emailAdress field`,
-      });
-      next(err);
-    }
+    );
   },
 
   getUserById: (req, res) => {
     const userID = req.params.userId;
-    const selectedUser = database.filter((item) => item.id == userID);
-    if (selectedUser.length > 0) {
-      res.send(database[userID]);
-    } else {
-      res.status(400).json({
-        Status: 400,
-        Message: `user not found`,
-      });
-    }
+    Database.query(
+      "SELECT * FROM user WHERE id =? ",
+      [userID],
+      (err, rows, fields) => {
+        if (err) {
+          console.log(err);
+          res.status(400).json({
+            Status: 400,
+            Message: `Something went wrong`,
+          });
+        } else {
+          res.send(rows);
+        }
+      }
+    );
   },
 
   editUser: (req, res) => {
     const userID = req.params.userId;
-
     let user = req.body;
-    try {
-      const selectedUser = database.filter((item) => item.id == userID);
-      if (selectedUser.length > 0) {
-        user = { id: userID, ...user };
-        database[userID] = user;
-        res.send(database[userID]);
-      } else {
-        res.status(400).json({
-          Status: 400,
-          Message: `user not found`,
-        });
+
+    Database.query(
+      "update user set firstName =?, lastName =?, isActive =?, emailAdress = ?, password =?, phoneNumber =?, street =?, city =? WHERE id = ? ",
+      [
+        user.firstName,
+        user.lastName,
+        user.isActive,
+        user.emailAdress,
+        user.password,
+        user.phoneNumber,
+        user.street,
+        user.city,
+        userID
+      ],
+      (err, rows, fields) => {
+        if (err) {
+          if (err.code == "ER_DUP_ENTRY") {
+            console.log(err);
+
+            res.status(400).json({
+              Status: 400,
+              Message: `Email already exists`,
+            });
+          } else {
+            console.log(err);
+            res.status(400).json({
+              Status: 400,
+              Message: `Something went wrong`,
+            });
+          }
+        } else {
+          res.status(200).json({
+            Status: 200,
+            Message: `User successfully updated`,
+          });
+        }
       }
-    } catch (Exception) {
-      res.status(400).json({
-        Status: 400,
-        Message: `Something went wrong`,
-      });
-    }
+    );
   },
 
   deleteUser: (req, res) => {
     const userID = req.params.userId;
     let user = req.body;
-    try {
-      const selectedUser = database.filter((item) => item.id == userID);
-      if (selectedUser.length > 0) {
-        database.splice(userID, 1);
-        res.status(200).json({
-          Status: 200,
-          Message: `User succesfully deleted!`,
-        });
-      } else {
-        res.status(400).json({
-          Status: 400,
-          Message: `user not found`,
-        });
+    Database.query(
+      "DELETE FROM user WHERE id = ?",
+      [userID],
+      (err, rows, fields) => {
+        if (err) {
+          res.status(400).json({
+            Status: 400,
+            Message: `Something went wrong`,
+          });
+        } else {
+          res.status(200).json({
+            Status: 200,
+            Message: `User successfully deleted`,
+          });
+        }
       }
-    } catch (Exception) {
-      res.status(400).json({
-        Status: 400,
-        Message: `body does not contain emailAdress field`,
-      });
-    }
+    );
   },
 
   getUsers: (req, res) => {
-    res.send(database);
+    Database.query("SELECT * FROM user", (err, rows, fields) => {
+      if (err) {
+        console.log(err);
+        res.status(400).json({
+          Status: 400,
+          Message: `Something went wrong`,
+        });
+      } else {
+        res.send(rows);
+      }
+    });
   },
 
   getUserProfile: (req, res) => {
