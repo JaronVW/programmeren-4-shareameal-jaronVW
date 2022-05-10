@@ -32,12 +32,14 @@ app.all("*", (req, res) => {
 });
 
 app.use((err, req, res) => {
+  console.log("hier")
   res.status(err.status).json(err);
 });
 
-// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 
 app.listen(port, () => {
   console.log(`app listening on http://localhost:${port}`);
 });
+
+module.exports = app;
