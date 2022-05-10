@@ -120,10 +120,10 @@ const controller = {
               Status: 409,
               Message: `Email already exists`,
             });
-          } else if(rows.changedRows == 0){
+          } else if (rows.length === 0) {
             res.status(404).json({
               Status: 404,
-              Message: `ID not found`,
+              Message: `ID does not exist`,
             });
           } else {
             console.log(err);
@@ -133,11 +133,9 @@ const controller = {
             });
           }
         } else {
+          console.log(rows.affectedRows)
           
-          res.status(200).json({
-            Status: 200,
-            Message: `User successfully updated`,
-          });
+          res.status(200).json(req.body);
           return;
         }
       }
