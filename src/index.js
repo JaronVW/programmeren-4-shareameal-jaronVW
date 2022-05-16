@@ -4,10 +4,10 @@ app.use(express.json());
 require("dotenv").config();
 // const swaggerUi = require('swagger-ui-express');
 // const swaggerDocument = require('./swagger.json');
-
 const port = process.env.PORT;
 
 const userRouter = require("./routes/user-router");
+const authRouter = require("./routes/auth-router");
 
 // app.all("*", (req, res, next) => {
 //   const method = req.method;
@@ -23,6 +23,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/user", userRouter);
+app.use("/api/auth", authRouter);
 
 app.all("*", (req, res) => {
   res.status(401).json({
@@ -40,6 +41,10 @@ app.use((err, req, res) => {
 
 app.listen(port, () => {
   console.log(`app listening on http://localhost:${port}`);
+});
+
+process.on('warning', (warning) => {
+  console.log(warning.stack);
 });
 
 module.exports = app;

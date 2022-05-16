@@ -1,7 +1,6 @@
 const Database = require("../db");
 const assert = require("assert");
 const { validationResult } = require("express-validator");
-const JWT = require("jsonwebtoken");
 
 const controller = {
   validateUser: (req, res, next) => {

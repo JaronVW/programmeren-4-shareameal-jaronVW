@@ -1,7 +1,14 @@
 const router = require("express").Router();
 
-const { body, validationResult } = require('express-validator');
-const { addUser, getUserById, editUser, deleteUser, getUserProfile, getUsers, validateUser } = require("../controllers/user-controller");
+const {
+  addUser,
+  getUserById,
+  editUser,
+  deleteUser,
+  getUserProfile,
+  getUsers,
+  validateUser,
+} = require("../controllers/user-controller");
 
 router.post("/", validateUser, addUser);
 
