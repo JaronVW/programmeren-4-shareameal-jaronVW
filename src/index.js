@@ -2,12 +2,11 @@ const express = require("express");
 const app = express();
 app.use(express.json());
 require("dotenv").config();
-// const swaggerUi = require('swagger-ui-express');
-// const swaggerDocument = require('./swagger.json');
 const port = process.env.PORT;
 
 const userRouter = require("./routes/user-router");
 const authRouter = require("./routes/auth-router");
+const mealRouter = require("./routes/meal-router")
 
 // app.all("*", (req, res, next) => {
 //   const method = req.method;
@@ -24,6 +23,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/meal", mealRouter);
 
 app.all("*", (req, res) => {
   res.status(401).json({

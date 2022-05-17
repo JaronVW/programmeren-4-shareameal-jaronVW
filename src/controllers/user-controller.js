@@ -2,6 +2,9 @@ const Database = require("../db");
 const assert = require("assert");
 const { validationResult } = require("express-validator");
 
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
+
 const controller = {
   validateUser: (req, res, next) => {
     let user = req.body;
@@ -33,40 +36,49 @@ const controller = {
     if (user.isActive == null) {
       user.isActive = true;
     }
-    Database.query(
-      "INSERT INTO user (firstName,lastName,isActive,emailAdress,password,phoneNumber,street,city) VALUES(?,?,?,?,?,?,?,?)",
-      [
-        user.firstName,
-        user.lastName,
-        user.isActive,
-        user.emailAdress,
-        user.password,
-        user.phoneNumber,
-        user.street,
-        user.city,
-      ],
-      (err, rows, fields) => {
-        if (err) {
-          if (err.code == "ER_DUP_ENTRY") {
-            res.status(409).json({
-              Status: 400,
-              Message: `Email already exists`,
-            });
+
+    bcrypt.hash(user.password, saltRounds, function (err, hash) {
+      if (err) {
+        res.status(400).json({
+          Status: 400,
+          Message: `Something went wrong`,
+        });
+      }
+      Database.query(
+        "INSERT INTO user (firstName,lastName,isActive,emailAdress,password,phoneNumber,street,city) VALUES(?,?,?,?,?,?,?,?)",
+        [
+          user.firstName,
+          user.lastName,
+          user.isActive,
+          user.emailAdress,
+          hash,
+          user.phoneNumber,
+          user.street,
+          user.city,
+        ],
+        (err, rows, fields) => {
+          if (err) {
+            if (err.code == "ER_DUP_ENTRY") {
+              res.status(409).json({
+                Status: 400,
+                Message: `Email already exists`,
+              });
+            } else {
+              console.log(err);
+              res.status(400).json({
+                Status: 400,
+                Message: `Something went wrong`,
+              });
+            }
           } else {
-            console.log(err);
-            res.status(400).json({
-              Status: 400,
-              Message: `Something went wrong`,
+            res.status(200).json({
+              Status: 200,
+              Message: `User succesfully added!`,
             });
           }
-        } else {
-          res.status(200).json({
-            Status: 200,
-            Message: `User succesfully added!`,
-          });
         }
-      }
-    );
+      );
+    });
   },
 
   getUserById: (req, res) => {
@@ -97,49 +109,56 @@ const controller = {
     const userID = req.params.userId;
     let user = req.body;
 
-
-    Database.query(
-      "update user set firstName =?, lastName =?, isActive =?, emailAdress = ?, password =?, phoneNumber =?, street =?, city =? WHERE id = ? ",
-      [
-        user.firstName,
-        user.lastName,
-        user.isActive,
-        user.emailAdress,
-        user.password,
-        user.phoneNumber,
-        user.street,
-        user.city,
-        userID,
-      ],
-      (err, rows, fields) => {
-        if (err) {
-          if (err.code == "ER_DUP_ENTRY") {
-            console.log(err);
-
-            res.status(409).json({
-              Status: 409,
-              Message: `Email already exists`,
-            });
-          } else if (rows.length === 0) {
-            res.status(404).json({
-              Status: 404,
-              Message: `ID does not exist`,
-            });
-          } else {
-            console.log(err);
-            res.status(400).json({
-              Status: 400,
-              Message: `Something went wrong`,
-            });
-          }
-        } else {
-          console.log(rows.affectedRows)
-          
-          res.status(200).json(req.body);
-          return;
-        }
+    bcrypt.hash(user.password, saltRounds, function (err, hash) {
+      if (err) {
+        res.status(400).json({
+          Status: 400,
+          Message: `Something went wrong`,
+        });
       }
-    );
+      Database.query(
+        "update user set firstName =?, lastName =?, isActive =?, emailAdress = ?, password =?, phoneNumber =?, street =?, city =? WHERE id = ? ",
+        [
+          user.firstName,
+          user.lastName,
+          user.isActive,
+          user.emailAdress,
+          hash,
+          user.phoneNumber,
+          user.street,
+          user.city,
+          userID,
+        ],
+        (err, rows, fields) => {
+          if (err) {
+            if (err.code == "ER_DUP_ENTRY") {
+              console.log(err);
+
+              res.status(409).json({
+                Status: 409,
+                Message: `Email already exists`,
+              });
+            } else if (rows.length === 0) {
+              res.status(404).json({
+                Status: 404,
+                Message: `ID does not exist`,
+              });
+            } else {
+              console.log(err);
+              res.status(400).json({
+                Status: 400,
+                Message: `Something went wrong`,
+              });
+            }
+          } else {
+            console.log(rows.affectedRows);
+
+            res.status(200).json(req.body);
+            return;
+          }
+        }
+      );
+    });
   },
 
   deleteUser: (req, res) => {
