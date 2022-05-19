@@ -10,7 +10,7 @@ const { validateToken } = require("../controllers/auth-controller");
 
 router.get("/", getAllMeals);
 
-router.get("/:mealId", validateToken, getMealById);
+router.get("/:mealId",  getMealById);
 
 router.put("/:mealId", validateToken, updateMealById);
 

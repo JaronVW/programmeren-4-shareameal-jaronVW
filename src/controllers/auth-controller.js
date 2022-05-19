@@ -35,7 +35,7 @@ const controller = {
     } catch (err) {
       // console.log(err);
       res.status(400).json({
-        Status: 400,
+        status: 400,
         Message: err.message,
       });
     }
@@ -72,18 +72,17 @@ const controller = {
   login: (req, res) => {
     const { emailaddress, password } = req.body;
     Database.query(
-      "SELECT `id`, `emailAdress`,`password`,`firstName`,`lastName` FROM `user` WHERE `emailAdress` = ?",
+      "SELECT * FROM `user` WHERE `emailAdress` = ?",
       [emailaddress],
       (err, rows, fields) => {
         if (err) {
           // logger.error("Error: ", err.toString());
           res.status(500).json({
-            error: err.toString(),
-            datetime: new Date().toISOString(),
+            message: err.toString(),
           });
         }
         if (rows && rows.length === 1) {
-          const user = rows[0];
+          let user = rows[0];
           bcrypt.compare(password, user.password, (err, result) => {
             if (result) {
               JWT.sign(
@@ -92,15 +91,15 @@ const controller = {
                 { expiresIn: "7d" },
                 (err, token) => {
                   if (err) console.log(err);
+                  user.token = token;
                   res.status(200).json({
-                    Status: 200,
-                    result: token,
+                    result: user
                   });
                 }
               );
             } else {
-              res.status(404).json({
-                message: "password is incorrect",
+              res.status(500).json({
+                message: err.toString(),
               });
             }
           });
