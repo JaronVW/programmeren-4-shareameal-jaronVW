@@ -4,6 +4,7 @@ const {
   getMealById,
   updateMealById,
   deleteMealById,
+  addMeal,
 } = require("../controllers/meal-controller");
 
 const { validateToken } = require("../controllers/auth-controller");
@@ -11,6 +12,8 @@ const { validateToken } = require("../controllers/auth-controller");
 router.get("/", getAllMeals);
 
 router.get("/:mealId",  getMealById);
+
+router.post("/", validateToken, addMeal);
 
 router.put("/:mealId", validateToken, updateMealById);
 

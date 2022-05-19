@@ -29,15 +29,49 @@ const controller = {
             Message: `Something went wrong`,
           });
         } else {
-          if(rows.length == 0){
+          if (rows.length == 0) {
             res.status(404).json({
               Status: 404,
               Message: `Meal not found`,
             });
-          }else {
+          } else {
             res.send(rows);
           }
-          
+        }
+      }
+    );
+  },
+
+  addMeal: (req, res) => {
+    const meal = req.body;
+    
+    Database.query(
+      "INSERT INTO `meal`(`isActive`, `isVega`, `isVegan`, `isToTakeHome`, `dateTime`, `maxAmountOfParticipants`, `price`, `imageUrl`, `cookId`, `createDate`, `updateDate`, `name`, `description`) VALUES ('?,?,?,?,?,?,?,?,?,?,?,?,?,?') ",
+      [
+        meal.isActive,
+        meal.isVegan,
+        meal.isVega,
+        meal.isToTakeHome,
+        meal.dateTime,
+        meal.maxAmountOfParticipants,
+        meal.price,
+        meal.imageUrl,
+        req.jwtUserId,
+        new Date().toISOString(),
+        new Date().toISOString(),
+        meal.name,
+        meal.description,
+        // meal.allergenes,
+      ],
+      (err, rows, fields) => {
+        if (err) {
+          console.log(err);
+          res.status(400).json({
+            Status: 400,
+            Message: `Something went wrong`,
+          });
+        } else {
+          res.send(rows);
         }
       }
     );
@@ -62,7 +96,7 @@ const controller = {
     );
   },
 
-  deleteMealById: (req,res) =>{
+  deleteMealById: (req, res) => {
     const mealId = req.params.mealId;
     Database.query(
       "DELETE FROM meal WHERE id = ?",
@@ -105,7 +139,6 @@ const controller = {
       }
     );
   },
-  
 };
 
 module.exports = controller;

@@ -86,7 +86,7 @@ const controller = {
           bcrypt.compare(password, user.password, (err, result) => {
             if (result) {
               JWT.sign(
-                { userid: user.id },
+                { userId: user.id },
                 privateKey,
                 { expiresIn: "7d" },
                 (err, token) => {
