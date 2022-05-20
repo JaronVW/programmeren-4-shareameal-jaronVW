@@ -10,11 +10,11 @@ const bcrypt = require("bcrypt");
 
 const controller = {
   validateLogin: (req, res, next) => {
-    let user = req.body;
-
+    const user = req.body;
+    const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ Message: "invalid email" });
+      return res.status(400).json({ message: "invalid request" });
     }
 
     let { emailaddress, password } = user;
@@ -28,15 +28,43 @@ const controller = {
         password != null,
         "emailaddress/password must be provided in request"
       );
-
+      
       assert(typeof emailaddress == "string", "Emailaddress must be a string");
+      assert.match(emailaddress, emailRegex, "Email address must be valid");
       assert(typeof password == "string", "password must be a string");
       next();
     } catch (err) {
       // console.log(err);
       res.status(400).json({
-        status: 400,
-        Message: err.message,
+        message: err.message,
+      });
+    }
+  },
+
+  validateToken: (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      res.status(401).json({
+        error: "Authorization header missing!",
+        datetime: new Date().toISOString(),
+      });
+    } else {
+      // Strip the word 'Bearer ' from the headervalue
+      const token = authHeader.substring(7, authHeader.length);
+
+      JWT.verify(token, privateKey, (err, payload) => {
+        if (err) {
+          res.status(401).json({
+            error: "Not authorized",
+            datetime: new Date().toISOString(),
+          });
+        }
+        if (payload) {
+          // User heeft toegang. Voeg UserId uit payload toe aan
+          // request, voor ieder volgend endpoint.
+          req.jwtUserId = payload.userId;
+          next();
+        }
       });
     }
   },
@@ -93,7 +121,7 @@ const controller = {
                   if (err) console.log(err);
                   user.token = token;
                   res.status(200).json({
-                    result: user
+                    result: user,
                   });
                 }
               );

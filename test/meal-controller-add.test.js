@@ -1,7 +1,7 @@
 const chai = require("chai");
 const chaiHttp = require("chai-http");
 const mocha = require("mocha");
-const { init } = require("../src/index");
+// const { init } = require("../../src/index")
 const app = require("../src/index");
 const Database = require("../src/db");
 const { describe, it, beforeEach } = require("mocha");
@@ -52,8 +52,8 @@ describe("Authentication", () => {
 
           res.body.should.be
             .an("object")
-            .that.has.all.keys("result")
-          result.should.be.an("object").that.contains.key("token");
+            .that.has.all.keys("statusCode", "result");
+          result.should.be.a("string").that.contains("error");
           done();
         });
     });
@@ -68,9 +68,7 @@ describe("Authentication", () => {
         })
         .end((err, res) => {
           res.should.have.status(404);
-          res.body.should.be
-            .an("object")
-            .that.has.all.keys("message");
+          res.body.should.be.an("object").that.has.all.keys("message");
           message.should.be.a("string").that.contains("error");
           done();
         });

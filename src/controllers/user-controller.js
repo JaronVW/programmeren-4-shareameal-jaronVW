@@ -3,27 +3,52 @@ const assert = require("assert");
 const { validationResult } = require("express-validator");
 
 const bcrypt = require("bcrypt");
+const { type } = require("os");
 const saltRounds = 10;
 
 const controller = {
   validateUser: (req, res, next) => {
     let user = req.body;
+    const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ Message: "invalid email" });
     }
 
-    let { firstName, lastName, emailAdress, password } = user;
+    let { firstName, lastName, emailAdress, password, street, city } = user;
 
     try {
-      assert(typeof firstName == "string", "first name must be a string");
-      assert(typeof lastName == "string", "last name must be a string");
-      assert(typeof emailAdress == "string", "email must be a string");
-      assert(typeof password == "string", "password must be a string");
+      assert(
+        typeof firstName == "string",
+        "first name must be a string/ must be provided in request"
+      );
+      assert(
+        typeof lastName == "string",
+        "last name must be a string/ must be provided in request"
+      );
+      assert(
+        typeof emailAdress == "string",
+        "email must be a string/ must be provided in request"
+      );
+      assert(
+        typeof password == "string",
+        "password must be a string/ must be provided in request"
+      );
+
+      assert(
+        typeof street == "string",
+        "street must be a string/ must be provided in request"
+      );
+      assert(
+        typeof city == "string",
+        "city must be a string/ must be provided in request"
+      );
+
+      assert.match(emailAdress, emailRegex, "Email address must be valid");
       next();
     } catch (err) {
-      // console.log(err);
+      console.log(err);
       res.status(400).json({
         Status: 400,
         Message: err.message,
@@ -45,7 +70,7 @@ const controller = {
         });
       }
       Database.query(
-        "INSERT INTO user (firstName,lastName,isActive,emailAdress,password,phoneNumber,street,city) VALUES(?,?,?,?,?,?,?,?)",
+        "INSERT INTO user (firstName,lastName,isActive,emailAdress,password,phoneNumber,street,city) VALUES(?,?,?,?,?,?,?,?);  SELECT  * from `user` WHERE id = LAST_INSERT_ID()",
         [
           user.firstName,
           user.lastName,
@@ -60,20 +85,17 @@ const controller = {
           if (err) {
             if (err.code == "ER_DUP_ENTRY") {
               res.status(409).json({
-                Status: 400,
-                Message: `Email already exists`,
+                message: `Email already exists`,
               });
             } else {
               console.log(err);
               res.status(400).json({
-                Status: 400,
-                Message: `Something went wrong`,
+                message: `Something went wrong`,
               });
             }
           } else {
-            res.status(200).json({
-              Status: 200,
-              Message: `User succesfully added!`,
+            res.status(201).json({
+              result: rows[1],
             });
           }
         }
@@ -184,17 +206,82 @@ const controller = {
   },
 
   getUsers: (req, res) => {
-    Database.query("SELECT * FROM user", (err, rows, fields) => {
-      if (err) {
-        console.log(err);
-        res.status(400).json({
-          Status: 400,
-          Message: `Something went wrong`,
-        });
-      } else {
-        res.send(rows);
-      }
-    });
+    let numberOfUsers = req.query.numberOfUsers;
+    let isActive = req.query.isActive;
+
+    console.log(req.query)
+
+    if (
+      (typeof numberOfUsers !== "undefined") &
+      (typeof isActive == "undefined")
+    ) {
+      Database.query(
+        "SELECT * FROM user LIMIT ? ",
+        [parseInt(numberOfUsers)],
+        (err, rows, fields) => {
+          if (err) {
+            console.log(err);
+            res.status(400).json({
+              Status: 400,
+              Message: `Something went wrong`,
+            });
+          } else {
+            res.send(rows);
+          }
+        }
+      );
+    } else if (
+      (typeof numberOfUsers == "undefined") &
+      (typeof isActive !== "undefined")
+    ) {
+      Database.query(
+        "SELECT * FROM user WHERE isActive = ? ",
+        [parseInt(isActive)],
+        (err, rows, fields) => {
+          if (err) {
+            console.log(err);
+            res.status(400).json({
+              Status: 400,
+              Message: `Something went wrong`,
+            });
+          } else {
+            res.send(rows);
+          }
+        }
+      );
+    } else if (
+      (typeof numberOfUsers !== "undefined") &
+      (typeof isActive !== "undefined")
+    ) {
+      console.log("aha")
+      Database.query(
+        "SELECT * FROM `user` WHERE isActive = ? LIMIT ? ",
+        [parseInt(isActive), parseInt(numberOfUsers)],
+        (err, rows, fields) => {
+          if (err) {
+            console.log(err);
+            res.status(400).json({
+              Status: 400,
+              Message: `Something went wrong`,
+            });
+          } else {
+            res.send(rows);
+          }
+        }
+      );
+    } else {
+      Database.query("SELECT * FROM user", (err, rows, fields) => {
+        if (err) {
+          console.log(err);
+          res.status(400).json({
+            Status: 400,
+            Message: `Something went wrong`,
+          });
+        } else {
+          res.send(rows);
+        }
+      });
+    }
   },
 
   getUserProfile: (req, res) => {
