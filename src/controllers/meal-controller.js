@@ -44,37 +44,46 @@ const controller = {
 
   addMeal: (req, res) => {
     const meal = req.body;
-    
-    Database.query(
-      "INSERT INTO `meal`(`isActive`, `isVega`, `isVegan`, `isToTakeHome`, `dateTime`, `maxAmountOfParticipants`, `price`, `imageUrl`, `cookId`, `createDate`, `updateDate`, `name`, `description`) VALUES ('?,?,?,?,?,?,?,?,?,?,?,?,?,?') ",
-      [
-        meal.isActive,
-        meal.isVegan,
-        meal.isVega,
-        meal.isToTakeHome,
-        meal.dateTime,
-        meal.maxAmountOfParticipants,
-        meal.price,
-        meal.imageUrl,
-        req.jwtUserId,
-        new Date().toISOString(),
-        new Date().toISOString(),
-        meal.name,
-        meal.description,
-        // meal.allergenes,
-      ],
-      (err, rows, fields) => {
-        if (err) {
-          console.log(err);
-          res.status(400).json({
-            Status: 400,
-            Message: `Something went wrong`,
-          });
-        } else {
-          res.send(rows);
+    if (typeof req.jwtUserId === "undefined") {
+      res.status(400).json({
+        Status: 400,
+        message: `Not logged in`,
+      });
+    } else {
+      const date = new Date().toISOString();
+      Database.query(
+        "INSERT INTO `meal`(`isActive`, `isVega`, `isVegan`, `isToTakeHome`, `dateTime`, `maxAmountOfParticipants`, `price`, `imageUrl`, `cookId`, `createDate`, `updateDate`, `name`, `description`, `allergenes`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?); SELECT  * from `meal` WHERE id = LAST_INSERT_ID();",
+        [
+          meal.isActive,
+          meal.isVegan,
+          meal.isVega,
+          meal.isToTakeHome,
+          meal.dateTime,
+          meal.maxAmountOfParticipants,
+          meal.price,
+          meal.imageUrl,
+          req.jwtUserId,
+          date,
+          date,
+          meal.name,
+          meal.description,
+          meal.allergenes,
+        ],
+        (err, rows, fields) => {
+          if (err) {
+            console.log(err);
+            res.status(400).json({
+              Status: 400,
+              Message: `Something went wrong`,
+            });
+          } else {
+            res.status(201).json({
+              result: rows[1],
+            });
+          }
         }
-      }
-    );
+      );
+    }
   },
 
   updateMealById: (req, res) => {
