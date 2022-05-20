@@ -36,7 +36,7 @@ const controller = {
     } catch (err) {
       // console.log(err);
       res.status(400).json({
-        message: err.message,
+        message: err.message,exist
       });
     }
   },
@@ -63,6 +63,7 @@ const controller = {
           // User heeft toegang. Voeg UserId uit payload toe aan
           // request, voor ieder volgend endpoint.
           req.jwtUserId = payload.userId;
+          console.log("hier kom ik langs")
           next();
         }
       });

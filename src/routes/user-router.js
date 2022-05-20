@@ -1,5 +1,6 @@
 const router = require("express").Router();
 
+const { validateToken } = require("../controllers/auth-controller");
 const {
   addUser,
   getUserById,
@@ -12,6 +13,8 @@ const {
 
 router.post("/", validateUser, addUser);
 
+router.get("/profile", validateToken, getUserProfile);
+
 router.get("/:userId", getUserById);
 
 router.put("/:userId", editUser);
@@ -20,6 +23,8 @@ router.delete("/:userId", deleteUser);
 
 router.get("/", getUsers);
 
-router.get("/login", getUserProfile);
+
+
+
 
 module.exports = router;

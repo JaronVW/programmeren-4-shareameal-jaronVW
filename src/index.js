@@ -33,7 +33,6 @@ app.all("*", (req, res) => {
 });
 
 app.use((err, req, res) => {
-  console.log("hier")
   res.status(err.status).json(err);
 });
 

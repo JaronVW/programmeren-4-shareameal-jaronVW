@@ -116,6 +116,7 @@ const controller = {
             Message: `Something went wrong`,
           });
         } else if (rows.length === 0) {
+          console.log("hier?")
           res.status(404).json({
             Status: 404,
             Message: `ID does not exist`,
@@ -285,10 +286,25 @@ const controller = {
   },
 
   getUserProfile: (req, res) => {
-    res.status(200).json({
-      Status: 200,
-      Message: `Requires JWT implementation, still in progress`,
-    });
+    if(typeof req.jwtUserId !== "undefined"){
+      Database.query("SELECT * FROM user WHERE id = ?",[req.jwtUserId], (err, rows, fields) => {  
+        if (err) {
+          console.log(err);
+          res.status(400).json({
+            Status: 400,
+            Message: `Something went wrong`,
+          });
+        } else {
+          res.send(rows);
+        }
+      });
+    } else {
+      res.status(401).json({
+        status: 400,
+        message: `Not logged in`,
+      });
+    }
+    
   },
 };
 
