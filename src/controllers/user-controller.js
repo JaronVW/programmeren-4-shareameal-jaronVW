@@ -104,121 +104,11 @@ const controller = {
   },
 
   getUserById: (req, res) => {
-    const userID = req.params.userId;
-    Database.query(
-      "SELECT * FROM user WHERE id =? ",
-      [userID],
-      (err, rows, fields) => {
-        if (err) {
-          console.log(err);
-          res.status(400).json({
-            Status: 400,
-            Message: `Something went wrong`,
-          });
-        } else if (rows.length === 0) {
-          console.log("hier?")
-          res.status(404).json({
-            Status: 404,
-            Message: `ID does not exist`,
-          });
-        } else {
-          res.send(rows);
-        }
-      }
-    );
-  },
-
-  editUser: (req, res) => {
-    const userID = req.params.userId;
-    let user = req.body;
-
-    bcrypt.hash(user.password, saltRounds, function (err, hash) {
-      if (err) {
-        res.status(400).json({
-          Status: 400,
-          Message: `Something went wrong`,
-        });
-      }
+    if (typeof req.jwtUserId !== "undefined") {
+      const userID = req.params.userId;
       Database.query(
-        "update user set firstName =?, lastName =?, isActive =?, emailAdress = ?, password =?, phoneNumber =?, street =?, city =? WHERE id = ? ",
-        [
-          user.firstName,
-          user.lastName,
-          user.isActive,
-          user.emailAdress,
-          hash,
-          user.phoneNumber,
-          user.street,
-          user.city,
-          userID,
-        ],
-        (err, rows, fields) => {
-          if (err) {
-            if (err.code == "ER_DUP_ENTRY") {
-              console.log(err);
-
-              res.status(409).json({
-                Status: 409,
-                Message: `Email already exists`,
-              });
-            } else if (rows.length === 0) {
-              res.status(404).json({
-                Status: 404,
-                Message: `ID does not exist`,
-              });
-            } else {
-              console.log(err);
-              res.status(400).json({
-                Status: 400,
-                Message: `Something went wrong`,
-              });
-            }
-          } else {
-            console.log(rows.affectedRows);
-
-            res.status(200).json(req.body);
-            return;
-          }
-        }
-      );
-    });
-  },
-
-  deleteUser: (req, res) => {
-    const userID = req.params.userId;
-    let user = req.body;
-    Database.query(
-      "DELETE FROM user WHERE id = ?",
-      [userID],
-      (err, rows, fields) => {
-        if (err) {
-          res.status(400).json({
-            Status: 400,
-            Message: `Something went wrong`,
-          });
-        } else {
-          res.status(200).json({
-            Status: 200,
-            Message: `User successfully deleted`,
-          });
-        }
-      }
-    );
-  },
-
-  getUsers: (req, res) => {
-    let numberOfUsers = req.query.numberOfUsers;
-    let isActive = req.query.isActive;
-
-    console.log(req.query)
-
-    if (
-      (typeof numberOfUsers !== "undefined") &
-      (typeof isActive == "undefined")
-    ) {
-      Database.query(
-        "SELECT * FROM user LIMIT ? ",
-        [parseInt(numberOfUsers)],
+        "SELECT * FROM user WHERE id =? ",
+        [userID],
         (err, rows, fields) => {
           if (err) {
             console.log(err);
@@ -226,44 +116,11 @@ const controller = {
               Status: 400,
               Message: `Something went wrong`,
             });
-          } else {
-            res.send(rows);
-          }
-        }
-      );
-    } else if (
-      (typeof numberOfUsers == "undefined") &
-      (typeof isActive !== "undefined")
-    ) {
-      Database.query(
-        "SELECT * FROM user WHERE isActive = ? ",
-        [parseInt(isActive)],
-        (err, rows, fields) => {
-          if (err) {
-            console.log(err);
-            res.status(400).json({
-              Status: 400,
-              Message: `Something went wrong`,
-            });
-          } else {
-            res.send(rows);
-          }
-        }
-      );
-    } else if (
-      (typeof numberOfUsers !== "undefined") &
-      (typeof isActive !== "undefined")
-    ) {
-      console.log("aha")
-      Database.query(
-        "SELECT * FROM `user` WHERE isActive = ? LIMIT ? ",
-        [parseInt(isActive), parseInt(numberOfUsers)],
-        (err, rows, fields) => {
-          if (err) {
-            console.log(err);
-            res.status(400).json({
-              Status: 400,
-              Message: `Something went wrong`,
+          } else if (rows.length === 0) {
+            console.log("hier?");
+            res.status(404).json({
+              Status: 404,
+              Message: `ID does not exist`,
             });
           } else {
             res.send(rows);
@@ -271,32 +128,67 @@ const controller = {
         }
       );
     } else {
-      Database.query("SELECT * FROM user", (err, rows, fields) => {
-        if (err) {
-          console.log(err);
-          res.status(400).json({
-            Status: 400,
-            Message: `Something went wrong`,
-          });
-        } else {
-          res.send(rows);
-        }
+      res.status(401).json({
+        status: 400,
+        message: `Not logged in`,
       });
     }
   },
 
-  getUserProfile: (req, res) => {
-    if(typeof req.jwtUserId !== "undefined"){
-      Database.query("SELECT * FROM user WHERE id = ?",[req.jwtUserId], (err, rows, fields) => {  
+  editUser: (req, res) => {
+    if (typeof req.jwtUserId !== "undefined") {
+      const userID = req.params.userId;
+      let user = req.body;
+
+      bcrypt.hash(user.password, saltRounds, function (err, hash) {
         if (err) {
-          console.log(err);
           res.status(400).json({
             Status: 400,
             Message: `Something went wrong`,
           });
-        } else {
-          res.send(rows);
         }
+        Database.query(
+          "update user set firstName =?, lastName =?, isActive =?, emailAdress = ?, password =?, phoneNumber =?, street =?, city =? WHERE id = ? ",
+          [
+            user.firstName,
+            user.lastName,
+            user.isActive,
+            user.emailAdress,
+            hash,
+            user.phoneNumber,
+            user.street,
+            user.city,
+            userID,
+          ],
+          (err, rows, fields) => {
+            if (err) {
+              if (err.code == "ER_DUP_ENTRY") {
+                console.log(err);
+
+                res.status(409).json({
+                  Status: 409,
+                  Message: `Email already exists`,
+                });
+              } else if (rows.length === 0) {
+                res.status(404).json({
+                  Status: 404,
+                  Message: `ID does not exist`,
+                });
+              } else {
+                console.log(err);
+                res.status(400).json({
+                  Status: 400,
+                  Message: `Something went wrong`,
+                });
+              }
+            } else {
+              console.log(rows.affectedRows);
+
+              res.status(200).json(req.body);
+              return;
+            }
+          }
+        );
       });
     } else {
       res.status(401).json({
@@ -304,7 +196,144 @@ const controller = {
         message: `Not logged in`,
       });
     }
-    
+  },
+
+  deleteUser: (req, res) => {
+    if (typeof req.jwtUserId !== "undefined") {
+      const userID = req.params.userId;
+      let user = req.body;
+      Database.query(
+        "DELETE FROM user WHERE id = ?",
+        [userID],
+        (err, rows, fields) => {
+          if (err) {
+            res.status(400).json({
+              Status: 400,
+              Message: `Something went wrong`,
+            });
+          } else {
+            res.status(200).json({
+              Status: 200,
+              Message: `User successfully deleted`,
+            });
+          }
+        }
+      );
+    } else {
+      res.status(401).json({
+        status: 400,
+        message: `Not logged in`,
+      });
+    }
+  },
+
+  getUsers: (req, res) => {
+    if (typeof req.jwtUserId !== undefined) {
+      let numberOfUsers = req.query.numberOfUsers;
+      let isActive = req.query.isActive;
+
+      if (
+        (typeof numberOfUsers !== "undefined") &
+        (typeof isActive == "undefined")
+      ) {
+        Database.query(
+          "SELECT * FROM user LIMIT ? ",
+          [parseInt(numberOfUsers)],
+          (err, rows, fields) => {
+            if (err) {
+              console.log(err);
+              res.status(400).json({
+                Status: 400,
+                Message: `Something went wrong`,
+              });
+            } else {
+              res.send(rows);
+            }
+          }
+        );
+      } else if (
+        (typeof numberOfUsers == "undefined") &
+        (typeof isActive !== "undefined")
+      ) {
+        Database.query(
+          "SELECT * FROM user WHERE isActive = ? ",
+          [parseInt(isActive)],
+          (err, rows, fields) => {
+            if (err) {
+              console.log(err);
+              res.status(400).json({
+                Status: 400,
+                Message: `Something went wrong`,
+              });
+            } else {
+              res.send(rows);
+            }
+          }
+        );
+      } else if (
+        (typeof numberOfUsers !== "undefined") &
+        (typeof isActive !== "undefined")
+      ) {
+        console.log("aha");
+        Database.query(
+          "SELECT * FROM `user` WHERE isActive = ? LIMIT ? ",
+          [parseInt(isActive), parseInt(numberOfUsers)],
+          (err, rows, fields) => {
+            if (err) {
+              console.log(err);
+              res.status(400).json({
+                Status: 400,
+                Message: `Something went wrong`,
+              });
+            } else {
+              res.send(rows);
+            }
+          }
+        );
+      } else {
+        Database.query("SELECT * FROM user", (err, rows, fields) => {
+          if (err) {
+            console.log(err);
+            res.status(400).json({
+              Status: 400,
+              Message: `Something went wrong`,
+            });
+          } else {
+            res.send(rows);
+          }
+        });
+      }
+    } else {
+      res.status(401).json({
+        status: 400,
+        message: `Not logged in`,
+      });
+    }
+  },
+
+  getUserProfile: (req, res) => {
+    if (typeof req.jwtUserId !== "undefined") {
+      Database.query(
+        "SELECT * FROM user WHERE id = ?",
+        [req.jwtUserId],
+        (err, rows, fields) => {
+          if (err) {
+            console.log(err);
+            res.status(400).json({
+              Status: 400,
+              Message: `Something went wrong`,
+            });
+          } else {
+            res.send(rows);
+          }
+        }
+      );
+    } else {
+      res.status(401).json({
+        status: 400,
+        message: `Not logged in`,
+      });
+    }
   },
 };
 
