@@ -149,7 +149,6 @@ const controller = {
               message: `Something went wrong`,
             });
           } else if (rows.length === 0) {
-            console.log("hier?");
             res.status(404).json({
               statusCode: 404,
               message: `ID does not exist`,
@@ -247,7 +246,7 @@ const controller = {
       const userID = req.params.userId;
 
       Database.query(
-        "SELECT id FROm `user` WHERE id = ? ",
+        "SELECT id FROM `user` WHERE id = ? ",
         [userID],
         (err, rows, fields) => {
           if (rows.length !== 0) {
@@ -295,10 +294,12 @@ const controller = {
     if (typeof req.jwtUserId !== "undefined") {
       let numberOfUsers = req.query.numberOfUsers;
       let isActive = req.query.isActive;
+      let firstName = req.query.firstName;
 
       if (
         (typeof numberOfUsers !== "undefined") &
-        (typeof isActive == "undefined")
+        (typeof isActive == "undefined") &
+        (typeof firstName == "undefined")
       ) {
         Database.query(
           "SELECT * FROM user LIMIT ? ",
@@ -319,7 +320,8 @@ const controller = {
         );
       } else if (
         (typeof numberOfUsers == "undefined") &
-        (typeof isActive !== "undefined")
+        (typeof isActive !== "undefined") &
+        (typeof firstName == "undefined")
       ) {
         Database.query(
           "SELECT * FROM user WHERE isActive = ? ",
@@ -339,13 +341,82 @@ const controller = {
           }
         );
       } else if (
+        (typeof numberOfUsers == "undefined") &
+        (typeof isActive == "undefined") &
+        (typeof firstName !== "undefined")
+      ) {
+        Database.query(
+          "SELECT * FROM user WHERE firstName = ? ",
+          [parseInt(firstName)],
+          (err, rows, fields) => {
+            if (err) {
+              console.log(err);
+              res.status(400).json({
+                statusCode: 400,
+                message: `Something went wrong`,
+              });
+            } else {
+              res.status(200).json({
+                result: rows,
+              });
+            }
+          }
+        );
+      } else if (
         (typeof numberOfUsers !== "undefined") &
-        (typeof isActive !== "undefined")
+        (typeof isActive !== "undefined") &
+        (typeof firstName == "undefined")
       ) {
         console.log("aha");
         Database.query(
           "SELECT * FROM `user` WHERE isActive = ? LIMIT ? ",
           [parseInt(isActive), parseInt(numberOfUsers)],
+          (err, rows, fields) => {
+            if (err) {
+              console.log(err);
+              res.status(400).json({
+                statusCode: 400,
+                message: `Something went wrong`,
+              });
+            } else {
+              res.status(200).json({
+                result: rows,
+              });
+            }
+          }
+        );
+      } else if (
+        (typeof numberOfUsers == "undefined") &
+        (typeof isActive !== "undefined") &
+        (typeof firstName !== "undefined")
+      ) {
+        console.log("aha");
+        Database.query(
+          "SELECT * FROM `user` WHERE isActive = ? AND firstName =? ",
+          [parseInt(isActive), firstName],
+          (err, rows, fields) => {
+            if (err) {
+              console.log(err);
+              res.status(400).json({
+                statusCode: 400,
+                message: `Something went wrong`,
+              });
+            } else {
+              res.status(200).json({
+                result: rows,
+              });
+            }
+          }
+        );
+      } else if (
+        (typeof numberOfUsers !== "undefined") &
+        (typeof isActive == "undefined") &
+        (typeof firstName !== "undefined")
+      ) {
+        console.log("aha");
+        Database.query(
+          "SELECT * FROM `user` WHERE firstName = ? LIMIT ?",
+          [firstName, parseInt(numberOfUsers)],
           (err, rows, fields) => {
             if (err) {
               console.log(err);

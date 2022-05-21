@@ -46,8 +46,7 @@ const controller = {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
       res.status(401).json({
-        error: "Authorization header missing!",
-        datetime: new Date().toISOString(),
+        message: "Not authorized",
       });
     } else {
       // Strip the word 'Bearer ' from the headervalue
@@ -64,7 +63,6 @@ const controller = {
           // User heeft toegang. Voeg UserId uit payload toe aan
           // request, voor ieder volgend endpoint.
           req.jwtUserId = payload.userId;
-          console.log("hier kom ik langs")
           next();
         }
       });

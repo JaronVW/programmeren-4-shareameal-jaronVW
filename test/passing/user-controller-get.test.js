@@ -8,9 +8,8 @@ const { describe, it, beforeEach } = require("mocha");
 const { should } = require("chai");
 
 require("dotenv").config();
-const token =  process.env.TEST_TOKEN;
+const token = process.env.TEST_TOKEN;
 let addedUser = 0;
-console.log(token);
 
 chai.should();
 chai.use(chaiHttp);
@@ -21,18 +20,17 @@ describe("Get users", () => {
     await promisePool.query("DELETE IGNORE FROM meal_participants_user");
     await promisePool.query("DELETE IGNORE FROM  meal");
     await promisePool.query("DELETE IGNORE FROM  user");
-    const [rows,fields] = await promisePool.query(
+    const [rows, fields] = await promisePool.query(
       "INSERT INTO `user` (`id`, `firstName`, `lastName`, `isActive`, `emailAdress`, `password`, `phoneNumber`, `roles`, `street`, `city`) VALUES (NULL, 'John', 'Doe', '1', 'j.doe@server.com', '$2b$10$BLw0vofUcGyP3vrEcsNK7.LLDUU2HszuRFVtCtkzZ/xtJXDHks6o2', NULL, 'editor,guest', 'Lovensdijkstraat 61', 'Breda'); SELECT * FROM `user` WHERE id = LAST_INSERT_ID()"
     );
     addedUser = rows[1];
-    console.log(addedUser[0].id)
   });
 
   it("Get zero users", (done) => {
     chai
       .request(app)
       .get("/api/user/?numberOfUsers=0")
-      .auth(token, { type: 'bearer' })
+      .auth(token, { type: "bearer" })
       .end((err, res) => {
         res.should.be.an("object");
         // console.log(res.Message);
@@ -46,7 +44,21 @@ describe("Get users", () => {
     chai
       .request(app)
       .get("/api/user/?numberOfUsers=2")
-      .auth(token, { type: 'bearer' })
+      .auth(token, { type: "bearer" })
+      .end((err, res) => {
+        res.should.be.an("object");
+        // console.log(res.Message);
+        res.should.have.status(200);
+        res.body.should.be.an("object").that.has.all.keys("result");
+        done();
+      });
+  });
+  
+  it("search name that does not exist", (done) => {
+    chai
+      .request(app)
+      .get("/api/user/?firstname=chris")
+      .auth(token, { type: "bearer" })
       .end((err, res) => {
         res.should.be.an("object");
         // console.log(res.Message);
@@ -56,11 +68,66 @@ describe("Get users", () => {
       });
   });
 
+  it("get inactive users ", (done) => {
+    chai
+      .request(app)
+      .get("/api/user/?isActive=0")
+      .auth(token, { type: "bearer" })
+      .end((err, res) => {
+        res.should.be.an("object");
+        // console.log(res.Message);
+        res.should.have.status(200);
+        res.body.should.be.an("object").that.has.all.keys("result");
+        done();
+      });
+  });
+
+  it("get active users ", (done) => {
+    chai
+      .request(app)
+      .get("/api/user/?isActive=1")
+      .auth(token, { type: "bearer" })
+      .end((err, res) => {
+        res.should.be.an("object");
+        // console.log(res.Message);
+        res.should.have.status(200);
+        res.body.should.be.an("object").that.has.all.keys("result");
+        done();
+      });
+  });
+
+  it("get two users ", (done) => {
+    chai
+      .request(app)
+      .get("/api/user/?isActive=1&firstname=John")
+      .auth(token, { type: "bearer" })
+      .end((err, res) => {
+        res.should.be.an("object");
+        // console.log(res.Message);
+        res.should.have.status(200);
+        res.body.should.be.an("object").that.has.all.keys("result");
+        done();
+      });
+  });
+
+  it("Unathorized request ", (done) => {
+    chai
+      .request(app)
+      .get("/api/user/")
+      .end((err, res) => {
+        res.should.be.an("object");
+        // console.log(res.Message);
+        res.should.have.status(401);
+        res.body.should.be.an("object").that.has.all.keys("message");
+        done();
+      });
+  });
+
   it("Get active users", (done) => {
     chai
       .request(app)
       .get("/api/user/?isActive=1")
-      .auth(token, { type: 'bearer' })
+      .auth(token, { type: "bearer" })
       .end((err, res) => {
         res.should.be.an("object");
         // console.log(res.Message);
@@ -74,7 +141,7 @@ describe("Get users", () => {
     chai
       .request(app)
       .get("/api/user/?isActive=0")
-      .auth(token, { type: 'bearer' })
+      .auth(token, { type: "bearer" })
       .end((err, res) => {
         res.should.be.an("object");
         // console.log(res.Message);
@@ -87,8 +154,8 @@ describe("Get users", () => {
   it("Get user that does not exist", (done) => {
     chai
       .request(app)
-      .get("/api/user/1")
-      .auth(token, { type: 'bearer' })
+      .get("/api/user/1000000000000")
+      .auth(token, { type: "bearer" })
       .end((err, res) => {
         res.should.be.an("object");
         // console.log(res.Message);
@@ -102,7 +169,33 @@ describe("Get users", () => {
     chai
       .request(app)
       .get(`/api/user/${addedUser[0].id}`)
-      .auth(token, { type: 'bearer' })
+      .auth(token, { type: "bearer" })
+      .end((err, res) => {
+        res.should.be.an("object");
+        // console.log(res.Message);
+        res.should.have.status(200);
+        done();
+      });
+  });
+
+  it("Get user profile", (done) => {
+    chai
+      .request(app)
+      .get(`/api/user/profile`)
+      .auth(token, { type: "bearer" })
+      .end((err, res) => {
+        res.should.be.an("object");
+        // console.log(res.Message);
+        res.should.have.status(200);
+        done();
+      });
+  });
+
+  it("Get user with specific name", (done) => {
+    chai
+      .request(app)
+      .get(`/api/user/?firstname=John`)
+      .auth(token, { type: "bearer" })
       .end((err, res) => {
         res.should.be.an("object");
         // console.log(res.Message);
