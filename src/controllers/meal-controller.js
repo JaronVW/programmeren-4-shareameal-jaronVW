@@ -7,7 +7,7 @@ const controller = {
       if (err) {
         console.log(err);
         res.status(400).json({
-          status: 400,
+          statusCode: 400,
           message: `Something went wrong`,
         });
       } else {
@@ -25,13 +25,13 @@ const controller = {
         if (err) {
           console.log(err);
           res.status(400).json({
-            status: 400,
+            statusCode: 400,
             message: `Something went wrong`,
           });
         } else {
           if (rows.length == 0) {
             res.status(404).json({
-              Status: 404,
+              statusCode: 404,
               message: `Meal not found`,
             });
           } else {
@@ -94,7 +94,7 @@ const controller = {
       next();
     } catch (err) {
       res.status(400).json({
-        status: 400,
+        statusCode: 400,
         message: err.message,
       });
     }
@@ -104,7 +104,7 @@ const controller = {
     const meal = req.body;
     if (typeof req.jwtUserId === "undefined") {
       res.status(400).json({
-        Status: 400,
+        statusCode: 400,
         message: `Not logged in`,
       });
     } else {
@@ -131,7 +131,7 @@ const controller = {
           if (err) {
             console.log(err);
             res.status(400).json({
-              status: 400,
+              statusCode: 400,
               message: `Something went wrong`,
             });
           } else {
@@ -153,7 +153,7 @@ const controller = {
         if (err) {
           console.log(err);
           res.status(400).json({
-            status: 400,
+            statusCode: 400,
             message: `Something went wrong`,
           });
         } else {
@@ -167,7 +167,7 @@ const controller = {
     const mealId = req.params.mealId;
     if (typeof req.jwtUserId === "undefined") {
       res.status(400).json({
-        Status: 400,
+        statusCode: 400,
         message: `Not logged in`,
       });
     } else {
@@ -179,7 +179,7 @@ const controller = {
           if (err) {
             console.log(err);
             res.status(400).json({
-              status: 400,
+              statusCode: 400,
               message: `Something went wrong`,
             });
           } else {
@@ -190,7 +190,7 @@ const controller = {
               });
             } else if (rows[1].length == 0) {
               return res.status(403).json({
-                status: 403,
+                statusCode: 403,
                 message: `Unauthorized`,
               });
             } else {
@@ -201,12 +201,12 @@ const controller = {
                   if (err) {
                     console.log(err);
                     res.status(400).json({
-                      status: 400,
+                      statusCode: 400,
                       message: `Something went wrong`,
                     });
                   } else {
                     res.status(200).json({
-                      status: 200,
+                      statusCode: 200,
                       message: `succesfully deleted meal`,
                     });
                   }
@@ -228,12 +228,12 @@ const controller = {
         if (err) {
           console.log(err);
           res.status(400).json({
-            status: 400,
+            statusCode: 400,
             message: `Something went wrong`,
           });
         } else {
           res.status(200).json({
-            status: 200,
+            statusCode: 200,
             message: `succesfully enrolled into meal`,
           });
         }

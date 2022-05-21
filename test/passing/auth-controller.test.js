@@ -31,7 +31,7 @@ describe("Authentication", () => {
       .end((err, res) => {
         res.should.be.an("object");
         res.should.have.status(400);
-        res.body.should.be.an("object").that.has.all.keys("statusCode", "message");
+        res.body.should.be.an("object").that.has.all.keys("statusCode","message");
         let { message } = res.body;
         message.should.be.a("string");
         done();
@@ -68,7 +68,7 @@ describe("Authentication", () => {
       .end((err, res) => {
         res.should.be.an("object");
         res.should.have.status(400);
-        res.body.should.be.an("object").that.has.all.keys("statusCode", "message");
+        res.body.should.be.an("object").that.has.all.keys("statusCode","message");
         let { message } = res.body;
         message.should.be.a("string");
         done();
@@ -86,7 +86,7 @@ describe("Authentication", () => {
       .end((err, res) => {
         res.should.be.an("object");
         res.should.have.status(404);
-        res.body.should.be.an("object").that.has.all.keys("statusCode", "message");
+        res.body.should.be.an("object").that.has.all.keys("statusCode","message");
         let { message } = res.body;
         message.should.be.a("string");
         done();
@@ -105,7 +105,7 @@ describe("Authentication", () => {
         res.should.be.an("object");
         res.should.have.status(400);
 
-        res.body.should.be.an("object").that.has.all.keys("statusCode", "message");
+        res.body.should.be.an("object").that.has.all.keys("statusCode","message");
         done();
       });
   });

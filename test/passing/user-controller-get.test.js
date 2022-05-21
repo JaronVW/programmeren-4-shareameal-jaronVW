@@ -118,7 +118,7 @@ describe("Get users", () => {
         res.should.be.an("object");
         // console.log(res.Message);
         res.should.have.status(401);
-        res.body.should.be.an("object").that.has.all.keys("message");
+        res.body.should.be.an("object").that.has.all.keys("statusCode","message");
         done();
       });
   });

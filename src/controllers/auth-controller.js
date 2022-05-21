@@ -46,6 +46,7 @@ const controller = {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
       res.status(401).json({
+        statusCode: 401,
         message: "Not authorized",
       });
     } else {
@@ -79,6 +80,7 @@ const controller = {
         if (err) {
           // logger.error("Error: ", err.toString());
           res.status(500).json({
+            statusCode: 500,
             message: err.toString(),
           });
         }

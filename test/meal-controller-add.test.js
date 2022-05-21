@@ -68,7 +68,7 @@ describe("Authentication", () => {
         })
         .end((err, res) => {
           res.should.have.status(404);
-          res.body.should.be.an("object").that.has.all.keys("message");
+          res.body.should.be.an("object").that.has.all.keys("statusCode","message");
           message.should.be.a("string").that.contains("error");
           done();
         });

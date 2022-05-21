@@ -284,7 +284,7 @@ const controller = {
       );
     } else {
       res.status(401).json({
-        status: 400,
+        statusCode: 401,
         message: `Not logged in`,
       });
     }
@@ -448,7 +448,7 @@ const controller = {
       }
     } else {
       res.status(401).json({
-        status: 400,
+        statusCode: 401,
         message: `Not logged in`,
       });
     }
@@ -475,7 +475,7 @@ const controller = {
       );
     } else {
       res.status(401).json({
-        status: 400,
+        statusCode: 401,
         message: `Not logged in`,
       });
     }
