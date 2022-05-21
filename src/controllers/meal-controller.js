@@ -145,6 +145,7 @@ const controller = {
   },
 
   updateMealById: (req, res) => {
+    if (typeof req.jwtUserId !== "undefined") {
     const mealId = req.params.mealId;
     Database.query(
       "SELECT * FROM meal WHERE id = ?",
@@ -160,7 +161,13 @@ const controller = {
           res.send(rows);
         }
       }
-    );
+    ); 
+    } else {
+      res.status(400).json({
+        statusCode: 400,
+        message: `Not logged in`,
+      });
+    }
   },
 
   deleteMealById: (req, res) => {
