@@ -1,6 +1,5 @@
 const chai = require("chai");
 const chaiHttp = require("chai-http");
-const mocha = require("mocha");
 const { init } = require("../../src/index");
 const app = require("../../src/index");
 const Database = require("../../src/db");
@@ -9,15 +8,18 @@ const { should } = require("chai");
 const JWT = require("jsonwebtoken");
 
 require("dotenv").config();
-const generatedToken = process.env.TEST_TOKEN;
-const privateKey = "test";
+let generatedToken = "";
+const privateKey =  "test";;
+let addedUser = 0;
+
+chai.should();
+chai.use(chaiHttp);
+
 JWT.sign({ userId: 500 }, privateKey, { expiresIn: "1y" }, (err, token) => {
   if (err) console.log(err);
   generatedToken = token;
 });
 
-chai.should();
-chai.use(chaiHttp);
 
 describe("Get users", () => {
   beforeEach(async () => {

@@ -8,14 +8,14 @@ const { should } = require("chai");
 const JWT = require("jsonwebtoken");
 
 require("dotenv").config();
-
-const privateKey = process.env.SECRET_JWT_KEY;
+let generatedToken = "";
+const privateKey =  "test";;
 let addedUser = 0;
 
 chai.should();
 chai.use(chaiHttp);
 
-let generatedToken = JWT.sign({ userId: 500 }, privateKey, { expiresIn: "1y" });
+generatedToken = JWT.sign({ userId: 500 }, privateKey, { expiresIn: "1y" });
 
 describe("Add meal", () => {
   beforeEach(async () => {

@@ -4,7 +4,7 @@ const { validationResult } = require("express-validator");
 
 const JWT = require("jsonwebtoken");
 require("dotenv").config();
-const privateKey = process.env.SECRET_JWT_KEY;
+const privateKey =  "test";;
 
 const bcrypt = require("bcrypt");
 
