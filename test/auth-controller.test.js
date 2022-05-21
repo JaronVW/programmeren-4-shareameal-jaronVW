@@ -1,9 +1,9 @@
 const chai = require("chai");
 const chaiHttp = require("chai-http");
 const mocha = require("mocha");
-const { init } = require("../../src/index");
-const app = require("../../src/index");
-const Database = require("../../src/db");
+const { init } = require("../src/index");
+const app = require("../src/index");
+const Database = require("../src/db");
 const { describe, it, beforeEach } = require("mocha");
 const { should } = require("chai");
 

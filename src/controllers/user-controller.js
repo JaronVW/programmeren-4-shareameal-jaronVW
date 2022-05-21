@@ -10,13 +10,14 @@ const controller = {
   validateUser: (req, res, next) => {
     let user = req.body;
     const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+    const containsOnlyNumbersEx = /^[0-9]+$/;
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ Message: "invalid email" });
     }
 
-    let { firstName, lastName, emailAdress, password, street, city } = user;
+    let { firstName, lastName, emailAdress, password, street, phoneNumber, city } = user;
 
     try {
       assert(
@@ -45,10 +46,18 @@ const controller = {
         "city must be a string/ must be provided in request"
       );
 
+      assert(typeof phoneNumber == "string" || null, "phone number must be empty or a string containing numbers")
+
+      if(typeof phoneNumber == "string" ){
+        assert(phoneNumber.length >= 8 && phoneNumber.length <= 11, "phone number must be between 8 and 11 characters");
+        assert.match(phoneNumber, containsOnlyNumbersEx, "Phone number can only contain numerical values");
+      }
+
+
       assert.match(emailAdress, emailRegex, "Email address must be valid");
       next();
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       res.status(400).json({
         Status: 400,
         Message: err.message,

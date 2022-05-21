@@ -17,7 +17,7 @@ router.get("/profile", validateToken, getUserProfile);
 
 router.get("/:userId", getUserById);
 
-router.put("/:userId", editUser);
+router.put("/:userId", validateToken, validateUser, editUser);
 
 router.delete("/:userId", deleteUser);
 
