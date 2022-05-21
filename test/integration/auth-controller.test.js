@@ -17,7 +17,7 @@ describe("Authentication", () => {
     await promisePool.query("DELETE IGNORE FROM  meal");
     await promisePool.query("DELETE IGNORE FROM  user");
     await promisePool.query(
-      "INSERT INTO `user` (`id`, `firstName`, `lastName`, `isActive`, `emailAdress`, `password`, `phoneNumber`, `roles`, `street`, `city`) VALUES (NULL, 'John', 'Doe', '1', 'j.doe@server.com', '$2b$10$BLw0vofUcGyP3vrEcsNK7.LLDUU2HszuRFVtCtkzZ/xtJXDHks6o2', NULL, 'editor,guest', 'Lovensdijkstraat 61', 'Breda') "
+      "INSERT INTO `user` (`id`, `firstName`, `lastName`, `isActive`, `emailAdress`, `password`, `phoneNumber`, `roles`, `street`, `city`) VALUES (NULL, 'John', 'Doe', '1', 'j.doe@server.com', '$2b$10$29kBZvA/Z2zdqN0yi2mw4eOQ0BZUAU582s2rntZivVt4D2UjAzs7u', NULL, 'editor,guest', 'Lovensdijkstraat 61', 'Breda') "
     );
   });
 
@@ -44,7 +44,7 @@ describe("Authentication", () => {
       .post(`/api/auth/login`)
       .send({
         emailaddress: "j.doe@server.com",
-        password: "secret",
+        password: "secret2555",
       })
       .end((err, res) => {
         res.should.be.an("object");
