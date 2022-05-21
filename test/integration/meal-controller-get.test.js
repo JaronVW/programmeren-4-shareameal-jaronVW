@@ -9,7 +9,7 @@ const JWT = require("jsonwebtoken");
 
 require("dotenv").config();
 let generatedToken = "";
-const privateKey = process.env.SECRET_JWT_KEY;
+const privateKey = "test";
 let addedUser = 0;
 
 chai.should();
@@ -20,7 +20,7 @@ JWT.sign({ userId: 500 }, privateKey, { expiresIn: "1y" }, (err, token) => {
   generatedToken = token;
 });
 
-describe("Add meal", () => {
+describe("Get meal", () => {
   beforeEach(async () => {
     const promisePool = Database.promise();
     await promisePool.query("DELETE IGNORE FROM meal_participants_user");

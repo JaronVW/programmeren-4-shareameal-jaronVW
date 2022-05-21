@@ -9,7 +9,7 @@ const JWT = require("jsonwebtoken");
 
 require("dotenv").config();
 let generatedToken = "";
-const privateKey = process.env.SECRET_JWT_KEY;
+const privateKey = "test";
 let addedUser = 0;
 
 chai.should();
@@ -18,6 +18,7 @@ chai.use(chaiHttp);
 JWT.sign({ userId: 500 }, privateKey, { expiresIn: "1y" }, (err, token) => {
   if (err) console.log(err);
   generatedToken = token;
+  console.log(generatedToken);
 });
 
 describe("Update users", () => {

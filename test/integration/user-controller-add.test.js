@@ -1,14 +1,25 @@
 const chai = require("chai");
 const chaiHttp = require("chai-http");
-const mocha = require("mocha");
 const { init } = require("../../src/index");
 const app = require("../../src/index");
 const Database = require("../../src/db");
 const { describe, it, beforeEach } = require("mocha");
 const { should } = require("chai");
+const JWT = require("jsonwebtoken");
+
+require("dotenv").config();
+let generatedToken = "";
+const privateKey = "test";
+let addedUser = 0;
 
 chai.should();
 chai.use(chaiHttp);
+
+JWT.sign({ userId: 500 }, privateKey, { expiresIn: "1y" }, (err, token) => {
+  if (err) console.log(err);
+  generatedToken = token;
+  console.log(generatedToken);
+});
 
 describe("Add users", () => {
   beforeEach(async () => {
@@ -17,7 +28,7 @@ describe("Add users", () => {
     await promisePool.query("DELETE IGNORE FROM  meal");
     await promisePool.query("DELETE IGNORE FROM  user");
     await promisePool.query(
-      "INSERT INTO `user` (`id`, `firstName`, `lastName`, `isActive`, `emailAdress`, `password`, `phoneNumber`, `roles`, `street`, `city`) VALUES (NULL, 'John', 'Doe', '1', 'j.doe@server.com', '$2b$10$BLw0vofUcGyP3vrEcsNK7.LLDUU2HszuRFVtCtkzZ/xtJXDHks6o2', NULL, 'editor,guest', 'Lovensdijkstraat 61', 'Breda') "
+      "INSERT INTO `user` (`id`, `firstName`, `lastName`, `isActive`, `emailAdress`, `password`, `phoneNumber`, `roles`, `street`, `city`) VALUES (500, 'John', 'Doe', '1', 'j.doe@server.com', '$2b$10$BLw0vofUcGyP3vrEcsNK7.LLDUU2HszuRFVtCtkzZ/xtJXDHks6o2', NULL, 'editor,guest', 'Lovensdijkstraat 61', 'Breda') "
     );
   });
 
@@ -25,6 +36,7 @@ describe("Add users", () => {
       chai
         .request(app)
         .post(`/api/user/`)
+        .auth(generatedToken, { type: "bearer" })
         .send({
           firstName: "John",
           lastName: "Doe",
@@ -46,6 +58,7 @@ describe("Add users", () => {
       chai
         .request(app)
         .post("/api/user")
+        .auth(generatedToken, { type: "bearer" })
         .send({
           lastName: "test",
           emailAdress: "test@test.nl",
@@ -63,6 +76,7 @@ describe("Add users", () => {
       chai
         .request(app)
         .post("/api/user")
+        .auth(generatedToken, { type: "bearer" })
         .send({
           firstName: "John",
           lastName: "Doe",
@@ -83,6 +97,7 @@ describe("Add users", () => {
       chai
         .request(app)
         .post("/api/user")
+              .auth(generatedToken, { type: "bearer" })
         .send({
           firstName: "John",
           lastName: "Doe",

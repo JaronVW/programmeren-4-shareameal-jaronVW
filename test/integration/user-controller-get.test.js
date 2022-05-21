@@ -6,10 +6,15 @@ const app = require("../../src/index");
 const Database = require("../../src/db");
 const { describe, it, beforeEach } = require("mocha");
 const { should } = require("chai");
+const JWT = require("jsonwebtoken");
 
 require("dotenv").config();
-const token = process.env.TEST_TOKEN;
-let addedUser = 0;
+const generatedToken = process.env.TEST_TOKEN;
+const privateKey = "test";
+JWT.sign({ userId: 500 }, privateKey, { expiresIn: "1y" }, (err, token) => {
+  if (err) console.log(err);
+  generatedToken = token;
+});
 
 chai.should();
 chai.use(chaiHttp);
@@ -30,7 +35,7 @@ describe("Get users", () => {
     chai
       .request(app)
       .get("/api/user/?numberOfUsers=0")
-      .auth(token, { type: "bearer" })
+      .auth(generatedToken, { type: "bearer" })
       .end((err, res) => {
         res.should.be.an("object");
         // console.log(res.Message);
@@ -44,7 +49,7 @@ describe("Get users", () => {
     chai
       .request(app)
       .get("/api/user/?numberOfUsers=2")
-      .auth(token, { type: "bearer" })
+      .auth(generatedToken, { type: "bearer" })
       .end((err, res) => {
         res.should.be.an("object");
         // console.log(res.Message);
@@ -58,7 +63,7 @@ describe("Get users", () => {
     chai
       .request(app)
       .get("/api/user/?firstname=chris")
-      .auth(token, { type: "bearer" })
+      .auth(generatedToken, { type: "bearer" })
       .end((err, res) => {
         res.should.be.an("object");
         // console.log(res.Message);
@@ -72,7 +77,7 @@ describe("Get users", () => {
     chai
       .request(app)
       .get("/api/user/?isActive=0")
-      .auth(token, { type: "bearer" })
+      .auth(generatedToken, { type: "bearer" })
       .end((err, res) => {
         res.should.be.an("object");
         // console.log(res.Message);
@@ -86,7 +91,7 @@ describe("Get users", () => {
     chai
       .request(app)
       .get("/api/user/?isActive=1")
-      .auth(token, { type: "bearer" })
+      .auth(generatedToken, { type: "bearer" })
       .end((err, res) => {
         res.should.be.an("object");
         // console.log(res.Message);
@@ -100,7 +105,7 @@ describe("Get users", () => {
     chai
       .request(app)
       .get("/api/user/?isActive=1&firstname=John")
-      .auth(token, { type: "bearer" })
+      .auth(generatedToken, { type: "bearer" })
       .end((err, res) => {
         res.should.be.an("object");
         // console.log(res.Message);
@@ -127,7 +132,7 @@ describe("Get users", () => {
     chai
       .request(app)
       .get("/api/user/?isActive=1")
-      .auth(token, { type: "bearer" })
+      .auth(generatedToken, { type: "bearer" })
       .end((err, res) => {
         res.should.be.an("object");
         // console.log(res.Message);
@@ -141,7 +146,7 @@ describe("Get users", () => {
     chai
       .request(app)
       .get("/api/user/?isActive=0")
-      .auth(token, { type: "bearer" })
+      .auth(generatedToken, { type: "bearer" })
       .end((err, res) => {
         res.should.be.an("object");
         // console.log(res.Message);
@@ -155,7 +160,7 @@ describe("Get users", () => {
     chai
       .request(app)
       .get("/api/user/1000000000000")
-      .auth(token, { type: "bearer" })
+      .auth(generatedToken, { type: "bearer" })
       .end((err, res) => {
         res.should.be.an("object");
         // console.log(res.Message);
@@ -169,7 +174,7 @@ describe("Get users", () => {
     chai
       .request(app)
       .get(`/api/user/${addedUser[0].id}`)
-      .auth(token, { type: "bearer" })
+      .auth(generatedToken, { type: "bearer" })
       .end((err, res) => {
         res.should.be.an("object");
         // console.log(res.Message);
@@ -182,7 +187,7 @@ describe("Get users", () => {
     chai
       .request(app)
       .get(`/api/user/profile`)
-      .auth(token, { type: "bearer" })
+      .auth(generatedToken, { type: "bearer" })
       .end((err, res) => {
         res.should.be.an("object");
         // console.log(res.Message);
@@ -195,7 +200,7 @@ describe("Get users", () => {
     chai
       .request(app)
       .get(`/api/user/?firstname=John`)
-      .auth(token, { type: "bearer" })
+      .auth(generatedToken, { type: "bearer" })
       .end((err, res) => {
         res.should.be.an("object");
         // console.log(res.Message);

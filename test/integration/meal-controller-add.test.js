@@ -8,17 +8,14 @@ const { should } = require("chai");
 const JWT = require("jsonwebtoken");
 
 require("dotenv").config();
-let generatedToken = "";
+
 const privateKey = process.env.SECRET_JWT_KEY;
 let addedUser = 0;
 
 chai.should();
 chai.use(chaiHttp);
 
-JWT.sign({ userId: 500 }, privateKey, { expiresIn: "1y" }, (err, token) => {
-  if (err) console.log(err);
-  generatedToken = token;
-});
+let generatedToken = JWT.sign({ userId: 500 }, privateKey, { expiresIn: "1y" });
 
 describe("Add meal", () => {
   beforeEach(async () => {
@@ -42,7 +39,7 @@ describe("Add meal", () => {
         isVega: false,
         isVegan: false,
         isToTakeHome: true,
-        dateTime: "2022-05-17T09:27:39.172Z",
+        dateTime: "2022-05-21 07:11:46",
         imageUrl:
           "https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg",
         allergenes: ["gluten", "noten", "lactose"],
@@ -59,7 +56,7 @@ describe("Add meal", () => {
       });
   });
 
-  it("Nog logged in", (done) => {
+  it("Not logged in", (done) => {
     chai
       .request(app)
       .post(`/api/meal/`)
@@ -70,7 +67,7 @@ describe("Add meal", () => {
         isVega: false,
         isVegan: false,
         isToTakeHome: true,
-        dateTime: "2022-05-17T09:27:39.172Z",
+        dateTime: "2022-05-21 07:11:46",
         imageUrl:
           "https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg",
         allergenes: ["gluten", "noten", "lactose"],
@@ -99,7 +96,7 @@ describe("Add meal", () => {
         isVega: false,
         isVegan: false,
         isToTakeHome: true,
-        dateTime: "2022-05-17T09:27:39.172Z",
+        dateTime: "2022-05-21 07:11:46",
         imageUrl:
           "https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg",
         allergenes: ["gluten", "noten", "lactose"],

@@ -1,14 +1,25 @@
 const chai = require("chai");
 const chaiHttp = require("chai-http");
-const mocha = require("mocha");
 const { init } = require("../../src/index");
 const app = require("../../src/index");
 const Database = require("../../src/db");
 const { describe, it, beforeEach } = require("mocha");
 const { should } = require("chai");
+const JWT = require("jsonwebtoken");
+
+require("dotenv").config();
+let generatedToken = "";
+const privateKey = "test";
+let addedUser = 0;
 
 chai.should();
 chai.use(chaiHttp);
+
+JWT.sign({ userId: 500 }, privateKey, { expiresIn: "1y" }, (err, token) => {
+  if (err) console.log(err);
+  generatedToken = token;
+  console.log(generatedToken);
+});
 
 describe("Authentication", () => {
   beforeEach(async () => {
@@ -17,7 +28,7 @@ describe("Authentication", () => {
     await promisePool.query("DELETE IGNORE FROM  meal");
     await promisePool.query("DELETE IGNORE FROM  user");
     await promisePool.query(
-      "INSERT INTO `user` (`id`, `firstName`, `lastName`, `isActive`, `emailAdress`, `password`, `phoneNumber`, `roles`, `street`, `city`) VALUES (NULL, 'John', 'Doe', '1', 'j.doe@server.com', '$2b$10$29kBZvA/Z2zdqN0yi2mw4eOQ0BZUAU582s2rntZivVt4D2UjAzs7u', NULL, 'editor,guest', 'Lovensdijkstraat 61', 'Breda') "
+      "INSERT INTO `user` (`id`, `firstName`, `lastName`, `isActive`, `emailAdress`, `password`, `phoneNumber`, `roles`, `street`, `city`) VALUES (500, 'John', 'Doe', '1', 'j.doe@server.com', '$2b$10$29kBZvA/Z2zdqN0yi2mw4eOQ0BZUAU582s2rntZivVt4D2UjAzs7u', NULL, 'editor,guest', 'Lovensdijkstraat 61', 'Breda') "
     );
   });
 
@@ -52,7 +63,7 @@ describe("Authentication", () => {
 
         res.body.should.be.an("object").that.has.all.keys("result");
         let { result } = res.body;
-        result.should.be.an("object").that.contains.key("token");
+        result.should.be.an("object")
         done();
       });
   });

@@ -9,7 +9,7 @@ const JWT = require("jsonwebtoken");
 
 require("dotenv").config();
 let generatedToken = "";
-const privateKey = process.env.SECRET_JWT_KEY;
+const privateKey = "test";
 let addedUser = 0;
 
 chai.should();
@@ -50,7 +50,7 @@ describe("Delete users", () => {
       });
   });
 
-  it("Delete user that is not allowed", (done) => {
+  it("Delete unallowed user", (done) => {
     chai
       .request(app)
       .delete(`/api/user/501`)
