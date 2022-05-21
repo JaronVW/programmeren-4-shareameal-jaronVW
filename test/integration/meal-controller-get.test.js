@@ -9,7 +9,7 @@ const JWT = require("jsonwebtoken");
 
 require("dotenv").config();
 let generatedToken = "";
-const privateKey = process.env.SECRET_JWT_KEY;
+const privateKey =  "test";;
 let addedUser = 0;
 
 chai.should();
