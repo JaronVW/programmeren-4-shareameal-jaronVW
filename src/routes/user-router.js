@@ -15,13 +15,13 @@ router.post("/", validateUser, addUser);
 
 router.get("/profile", validateToken, getUserProfile);
 
-router.get("/:userId", getUserById);
+router.get("/:userId",validateToken, getUserById);
 
 router.put("/:userId", validateToken, validateUser, editUser);
 
-router.delete("/:userId", deleteUser);
+router.delete("/:userId", validateToken, deleteUser);
 
-router.get("/", getUsers);
+router.get("/", validateToken, getUsers);
 
 
 

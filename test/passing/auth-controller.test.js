@@ -1,9 +1,9 @@
 const chai = require("chai");
 const chaiHttp = require("chai-http");
 const mocha = require("mocha");
-const { init } = require("../src/index");
-const app = require("../src/index");
-const Database = require("../src/db");
+const { init } = require("../../src/index");
+const app = require("../../src/index");
+const Database = require("../../src/db");
 const { describe, it, beforeEach } = require("mocha");
 const { should } = require("chai");
 
@@ -31,7 +31,7 @@ describe("Authentication", () => {
       .end((err, res) => {
         res.should.be.an("object");
         res.should.have.status(400);
-        res.body.should.be.an("object").that.has.all.keys("message");
+        res.body.should.be.an("object").that.has.all.keys("statusCode", "message");
         let { message } = res.body;
         message.should.be.a("string");
         done();
@@ -68,7 +68,7 @@ describe("Authentication", () => {
       .end((err, res) => {
         res.should.be.an("object");
         res.should.have.status(400);
-        res.body.should.be.an("object").that.has.all.keys("message");
+        res.body.should.be.an("object").that.has.all.keys("statusCode", "message");
         let { message } = res.body;
         message.should.be.a("string");
         done();
@@ -86,10 +86,29 @@ describe("Authentication", () => {
       .end((err, res) => {
         res.should.be.an("object");
         res.should.have.status(404);
-        res.body.should.be.an("object").that.has.all.keys("message");
+        res.body.should.be.an("object").that.has.all.keys("statusCode", "message");
         let { message } = res.body;
         message.should.be.a("string");
         done();
       });
   });
+
+  it("invalid password", (done) => {
+    chai
+      .request(app)
+      .post(`/api/auth/login`)
+      .send({
+        emailaddress: "j.doe@server.com",
+        password: "geheim",
+      })
+      .end((err, res) => {
+        res.should.be.an("object");
+        res.should.have.status(400);
+
+        res.body.should.be.an("object").that.has.all.keys("statusCode", "message");
+        done();
+      });
+  });
+
+  
 });

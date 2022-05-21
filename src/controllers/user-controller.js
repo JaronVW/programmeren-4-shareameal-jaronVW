@@ -14,10 +14,18 @@ const controller = {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ Message: "invalid email" });
+      return res.status(400).json({ message: "invalid email" });
     }
 
-    let { firstName, lastName, emailAdress, password, street, phoneNumber, city } = user;
+    let {
+      firstName,
+      lastName,
+      emailAdress,
+      password,
+      street,
+      phoneNumber,
+      city,
+    } = user;
 
     try {
       assert(
@@ -46,21 +54,35 @@ const controller = {
         "city must be a string/ must be provided in request"
       );
 
-      assert(typeof phoneNumber == "string" || null, "phone number must be empty or a string containing numbers")
+      assert(
+        typeof phoneNumber == "string" ||
+          phoneNumber == null ||
+          typeof phoneNumber == "undefined",
+        "phone number must be empty or a string containing numbers"
+      );
 
-      if(typeof phoneNumber == "string" ){
-        assert(phoneNumber.length >= 8 && phoneNumber.length <= 11, "phone number must be between 8 and 11 characters");
-        assert.match(phoneNumber, containsOnlyNumbersEx, "Phone number can only contain numerical values");
+      if (typeof phoneNumber == "string") {
+        assert(
+          (phoneNumber.length >= 8 && phoneNumber.length <= 11) ||
+            phoneNumber.length == 0,
+          "phone number must be between 8 and 11 characters"
+        );
+        assert.match(
+          phoneNumber,
+          containsOnlyNumbersEx,
+          "Phone number can only contain numerical values"
+        );
       }
 
+      assert(password.length >= 8);
 
       assert.match(emailAdress, emailRegex, "Email address must be valid");
       next();
     } catch (err) {
       // console.log(err);
       res.status(400).json({
-        Status: 400,
-        Message: err.message,
+        statusCode: 400,
+        message: err.message,
       });
     }
   },
@@ -74,8 +96,8 @@ const controller = {
     bcrypt.hash(user.password, saltRounds, function (err, hash) {
       if (err) {
         res.status(400).json({
-          Status: 400,
-          Message: `Something went wrong`,
+          statusCode: 400,
+          message: `Something went wrong`,
         });
       }
       Database.query(
@@ -94,6 +116,7 @@ const controller = {
           if (err) {
             if (err.code == "ER_DUP_ENTRY") {
               res.status(409).json({
+                statusCode: 409,
                 message: `Email already exists`,
               });
             } else {
@@ -122,17 +145,19 @@ const controller = {
           if (err) {
             console.log(err);
             res.status(400).json({
-              Status: 400,
-              Message: `Something went wrong`,
+              statusCode: 400,
+              message: `Something went wrong`,
             });
           } else if (rows.length === 0) {
             console.log("hier?");
             res.status(404).json({
-              Status: 404,
-              Message: `ID does not exist`,
+              statusCode: 404,
+              message: `ID does not exist`,
             });
           } else {
-            res.send(rows);
+            res.status(200).json({
+              result: rows,
+            });
           }
         }
       );
@@ -148,57 +173,67 @@ const controller = {
     if (typeof req.jwtUserId !== "undefined") {
       const userID = req.params.userId;
       let user = req.body;
-
-      bcrypt.hash(user.password, saltRounds, function (err, hash) {
-        if (err) {
-          res.status(400).json({
-            Status: 400,
-            Message: `Something went wrong`,
-          });
-        }
-        Database.query(
-          "update user set firstName =?, lastName =?, isActive =?, emailAdress = ?, password =?, phoneNumber =?, street =?, city =? WHERE id = ? ",
-          [
-            user.firstName,
-            user.lastName,
-            user.isActive,
-            user.emailAdress,
-            hash,
-            user.phoneNumber,
-            user.street,
-            user.city,
-            userID,
-          ],
-          (err, rows, fields) => {
-            if (err) {
-              if (err.code == "ER_DUP_ENTRY") {
-                console.log(err);
-
-                res.status(409).json({
-                  Status: 409,
-                  Message: `Email already exists`,
-                });
-              } else if (rows.length === 0) {
-                res.status(404).json({
-                  Status: 404,
-                  Message: `ID does not exist`,
-                });
-              } else {
-                console.log(err);
+      Database.query(
+        "SELECT id FROm `user` WHERE id = ? ",
+        [userID],
+        (err, rows, fields) => {
+          if (rows.length !== 0) {
+            bcrypt.hash(user.password, saltRounds, function (err, hash) {
+              if (err) {
                 res.status(400).json({
-                  Status: 400,
-                  Message: `Something went wrong`,
+                  statusCode: 400,
+                  message: `Something went wrong`,
                 });
               }
-            } else {
-              console.log(rows.affectedRows);
+              Database.query(
+                "update user set firstName =?, lastName =?, isActive =?, emailAdress = ?, password =?, phoneNumber =?, street =?, city =? WHERE id = ? ",
+                [
+                  user.firstName,
+                  user.lastName,
+                  user.isActive,
+                  user.emailAdress,
+                  hash,
+                  user.phoneNumber,
+                  user.street,
+                  user.city,
+                  userID,
+                ],
+                (err, rows, fields) => {
+                  if (err) {
+                    if (err.code == "ER_DUP_ENTRY") {
+                      console.log(err);
 
-              res.status(200).json(req.body);
-              return;
-            }
+                      res.status(409).json({
+                        statusCode: 409,
+                        message: `Email already exists`,
+                      });
+                    } else if (rows.length === 0) {
+                      res.status(404).json({
+                        statusCode: 404,
+                        message: `ID does not exist`,
+                      });
+                    } else {
+                      console.log(err);
+                      res.status(400).json({
+                        statusCode: 400,
+                        message: `Something went wrong`,
+                      });
+                    }
+                  } else {
+                    res.status(200).json(req.body);
+                    return;
+                  }
+                }
+              );
+            });
+          } else {
+            res.status(404).json({
+              statusCode: 404,
+              message: `User not found`,
+            });
           }
-        );
-      });
+        }
+      );
     } else {
       res.status(401).json({
         status: 400,
@@ -210,20 +245,40 @@ const controller = {
   deleteUser: (req, res) => {
     if (typeof req.jwtUserId !== "undefined") {
       const userID = req.params.userId;
-      let user = req.body;
+
       Database.query(
-        "DELETE FROM user WHERE id = ?",
+        "SELECT id FROm `user` WHERE id = ? ",
         [userID],
         (err, rows, fields) => {
-          if (err) {
-            res.status(400).json({
-              Status: 400,
-              Message: `Something went wrong`,
-            });
+          if (rows.length !== 0) {
+            if (userID == req.jwtUserId) {
+              Database.query(
+                "DELETE FROM user WHERE id = ?",
+                [userID],
+                (err, rows, fields) => {
+                  if (err) {
+                    res.status(400).json({
+                      statusCode: 400,
+                      message: `Something went wrong`,
+                    });
+                  } else {
+                    res.status(200).json({
+                      statusCode: 200,
+                      message: `User successfully deleted`,
+                    });
+                  }
+                }
+              );
+            } else {
+              res.status(403).json({
+                statusCode: 403,
+                message: `Unauthorized`,
+              });
+            }
           } else {
-            res.status(200).json({
-              Status: 200,
-              Message: `User successfully deleted`,
+            res.status(404).json({
+              statusCode: 404,
+              message: `User not found`,
             });
           }
         }
@@ -237,7 +292,7 @@ const controller = {
   },
 
   getUsers: (req, res) => {
-    if (typeof req.jwtUserId !== undefined) {
+    if (typeof req.jwtUserId !== "undefined") {
       let numberOfUsers = req.query.numberOfUsers;
       let isActive = req.query.isActive;
 
@@ -252,11 +307,13 @@ const controller = {
             if (err) {
               console.log(err);
               res.status(400).json({
-                Status: 400,
-                Message: `Something went wrong`,
+                statusCode: 400,
+                message: `Something went wrong`,
               });
             } else {
-              res.send(rows);
+              res.status(200).json({
+                result: rows,
+              });
             }
           }
         );
@@ -271,11 +328,13 @@ const controller = {
             if (err) {
               console.log(err);
               res.status(400).json({
-                Status: 400,
-                Message: `Something went wrong`,
+                statusCode: 400,
+                message: `Something went wrong`,
               });
             } else {
-              res.send(rows);
+              res.status(200).json({
+                result: rows,
+              });
             }
           }
         );
@@ -291,11 +350,13 @@ const controller = {
             if (err) {
               console.log(err);
               res.status(400).json({
-                Status: 400,
-                Message: `Something went wrong`,
+                statusCode: 400,
+                message: `Something went wrong`,
               });
             } else {
-              res.send(rows);
+              res.status(200).json({
+                result: rows,
+              });
             }
           }
         );
@@ -304,11 +365,13 @@ const controller = {
           if (err) {
             console.log(err);
             res.status(400).json({
-              Status: 400,
-              Message: `Something went wrong`,
+              statusCode: 400,
+              message: `Something went wrong`,
             });
           } else {
-            res.send(rows);
+            res.status(200).json({
+              result: rows,
+            });
           }
         });
       }
@@ -329,11 +392,13 @@ const controller = {
           if (err) {
             console.log(err);
             res.status(400).json({
-              Status: 400,
-              Message: `Something went wrong`,
+              statusCode: 400,
+              message: `Something went wrong`,
             });
           } else {
-            res.send(rows);
+            res.status(200).json({
+              result: rows,
+            });
           }
         }
       );

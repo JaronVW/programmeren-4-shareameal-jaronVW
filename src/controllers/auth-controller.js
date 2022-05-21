@@ -36,7 +36,8 @@ const controller = {
     } catch (err) {
       // console.log(err);
       res.status(400).json({
-        message: err.message,exist
+        statusCode: 400,
+        message: err.message
       });
     }
   },
@@ -70,33 +71,6 @@ const controller = {
     }
   },
 
-  validateToken: (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-      res.status(401).json({
-        error: "Authorization header missing!",
-        datetime: new Date().toISOString(),
-      });
-    } else {
-      // Strip the word 'Bearer ' from the headervalue
-      const token = authHeader.substring(7, authHeader.length);
-
-      JWT.verify(token, privateKey, (err, payload) => {
-        if (err) {
-          res.status(401).json({
-            error: "Not authorized",
-            datetime: new Date().toISOString(),
-          });
-        }
-        if (payload) {
-          // User heeft toegang. Voeg UserId uit payload toe aan
-          // request, voor ieder volgend endpoint.
-          req.jwtUserId = payload.userId;
-          next();
-        }
-      });
-    }
-  },
 
   login: (req, res) => {
     const { emailaddress, password } = req.body;
@@ -127,13 +101,15 @@ const controller = {
                 }
               );
             } else {
-              res.status(500).json({
-                message: err.toString(),
+              res.status(400).json({
+                statusCode: 400,
+                message: "password is incorrect",
               });
             }
           });
         } else {
           res.status(404).json({
+            statusCode: 404,
             message: "Email is incorrect",
           });
         }
