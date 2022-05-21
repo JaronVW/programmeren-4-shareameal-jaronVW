@@ -11,7 +11,7 @@ const controller = {
           message: `Something went wrong`,
         });
       } else {
-        res.status(200).json({result: rows});
+        res.status(200).json(rows);
       }
     });
   },
@@ -35,7 +35,7 @@ const controller = {
               message: `Meal not found`,
             });
           } else {
-            res.status(200).json({result: rows});
+            res.send(rows);
           }
         }
       }
