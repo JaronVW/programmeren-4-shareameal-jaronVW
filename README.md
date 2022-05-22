@@ -32,8 +32,22 @@ Further explanation about **.env** files can be found [here](https://www.ibm.com
 
 This makes sure the server makes use of your local configuration and prevents sensitive data from being published.
 ***
+## Database structure
+The Project contains the file **share-a-meal.sql**, this can be used to configure the database, after this is done and the database works the project is ready to be run.
+
 ## Starting the server
 ```
 npm start 
 ```
-This starts the server, a link to open the server in the browser can be found in the command line
+
+For developing, this command is recommended
+```
+npm run dev 
+```
+this restarts the server every time a file is saved.
+***
+## Testing
+```
+npm test
+```
+This runs the tests made with [Mocha](https://www.npmjs.com/package/mocha) and [Chai](https://www.npmjs.com/package/chai).

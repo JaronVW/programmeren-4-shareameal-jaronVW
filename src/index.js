@@ -6,7 +6,7 @@ const port = process.env.PORT;
 
 const userRouter = require("./routes/user-router");
 const authRouter = require("./routes/auth-router");
-const mealRouter = require("./routes/meal-router")
+const mealRouter = require("./routes/meal-router");
 
 // app.all("*", (req, res, next) => {
 //   const method = req.method;
@@ -36,13 +36,11 @@ app.use((err, req, res) => {
   res.status(err.status).json(err);
 });
 
-
-
 app.listen(port, () => {
   console.log(`app listening on http://localhost:${port}`);
 });
 
-process.on('warning', (warning) => {
+process.on("warning", (warning) => {
   console.log(warning.stack);
 });
 

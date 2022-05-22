@@ -5,7 +5,6 @@ const app = require("../../src/index");
 require("dotenv").config();
 let mysql = require("mysql2");
 
-
 const Database = mysql.createConnection({
   connectionLimit: 10,
   host: process.env.DB_HOST,
@@ -13,7 +12,7 @@ const Database = mysql.createConnection({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
-  multipleStatements: true
+  multipleStatements: true,
 });
 const { describe, it, beforeEach } = require("mocha");
 const { should } = require("chai");
@@ -21,7 +20,7 @@ const JWT = require("jsonwebtoken");
 
 require("dotenv").config();
 let generatedToken = "";
-const privateKey =  "test";;
+const privateKey = "test";
 let addedUser = 0;
 
 chai.should();
@@ -73,8 +72,8 @@ describe("Add meal", () => {
       .request(app)
       .post(`/api/meal/`)
       .send({
-        "name": "Lasagne",
-        "description": "Dé pastaklassieker bij uitstek.",
+        name: "Lasagne",
+        description: "Dé pastaklassieker bij uitstek.",
         isActive: true,
         isVega: false,
         isVegan: false,
@@ -102,8 +101,8 @@ describe("Add meal", () => {
       .post(`/api/meal/`)
       .auth(generatedToken, { type: "bearer" })
       .send({
-        "name": "Lasagne",
-        "description": "Dé pastaklassieker bij uitstek.",
+        name: "Lasagne",
+        description: "Dé pastaklassieker bij uitstek.",
         isActive: true,
         isVega: false,
         isVegan: false,
@@ -118,18 +117,13 @@ describe("Add meal", () => {
       .end((err, res) => {
         res.should.be.an("object");
         res.should.have.status(201);
-        res.body.should.be
-          .an("object")
-          .that.has.all.keys("result");
+        res.body.should.be.an("object").that.has.all.keys("result");
         done();
       });
   });
 
-  after(function(done) {
+  after(function (done) {
     Database.end();
     done();
-   });  
-
-  
-  
+  });
 });

@@ -158,14 +158,11 @@ describe("Update meal", () => {
       .end((err, res) => {
         res.should.be.an("object");
         res.should.have.status(200);
-        res.body.should.be
-          .an("object")
-          .that.has.all.keys("result");
+        res.body.should.be.an("object").that.has.all.keys("result");
         done();
       });
   });
 
-  
   it("Unauthorized", (done) => {
     chai
       .request(app)

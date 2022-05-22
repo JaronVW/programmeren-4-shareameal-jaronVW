@@ -5,7 +5,6 @@ const app = require("../../src/index");
 require("dotenv").config();
 let mysql = require("mysql2");
 
-
 const Database = mysql.createConnection({
   connectionLimit: 10,
   host: process.env.DB_HOST,
@@ -13,7 +12,7 @@ const Database = mysql.createConnection({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
-  multipleStatements: true
+  multipleStatements: true,
 });
 const { describe, it, beforeEach } = require("mocha");
 const { should } = require("chai");
@@ -54,7 +53,9 @@ describe("Authentication", () => {
       .end((err, res) => {
         res.should.be.an("object");
         res.should.have.status(400);
-        res.body.should.be.an("object").that.has.all.keys("statusCode","message");
+        res.body.should.be
+          .an("object")
+          .that.has.all.keys("statusCode", "message");
         let { message } = res.body;
         message.should.be.a("string");
         done();
@@ -75,7 +76,7 @@ describe("Authentication", () => {
 
         res.body.should.be.an("object").that.has.all.keys("result");
         let { result } = res.body;
-        result.should.be.an("object")
+        result.should.be.an("object");
         done();
       });
   });
@@ -91,7 +92,9 @@ describe("Authentication", () => {
       .end((err, res) => {
         res.should.be.an("object");
         res.should.have.status(400);
-        res.body.should.be.an("object").that.has.all.keys("statusCode","message");
+        res.body.should.be
+          .an("object")
+          .that.has.all.keys("statusCode", "message");
         let { message } = res.body;
         message.should.be.a("string");
         done();
@@ -109,7 +112,9 @@ describe("Authentication", () => {
       .end((err, res) => {
         res.should.be.an("object");
         res.should.have.status(404);
-        res.body.should.be.an("object").that.has.all.keys("statusCode","message");
+        res.body.should.be
+          .an("object")
+          .that.has.all.keys("statusCode", "message");
         let { message } = res.body;
         message.should.be.a("string");
         done();
@@ -128,15 +133,15 @@ describe("Authentication", () => {
         res.should.be.an("object");
         res.should.have.status(400);
 
-        res.body.should.be.an("object").that.has.all.keys("statusCode","message");
+        res.body.should.be
+          .an("object")
+          .that.has.all.keys("statusCode", "message");
         done();
       });
   });
 
-  after(function(done) {
+  after(function (done) {
     Database.end();
     done();
-   });
-
-
+  });
 });

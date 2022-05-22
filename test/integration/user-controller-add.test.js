@@ -5,7 +5,6 @@ const app = require("../../src/index");
 require("dotenv").config();
 let mysql = require("mysql2");
 
-
 const Database = mysql.createConnection({
   connectionLimit: 10,
   host: process.env.DB_HOST,
@@ -13,7 +12,7 @@ const Database = mysql.createConnection({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
-  multipleStatements: true
+  multipleStatements: true,
 });
 const { describe, it, beforeEach } = require("mocha");
 const { should } = require("chai");
@@ -44,98 +43,96 @@ describe("Add users", () => {
     );
   });
 
-    it("User already exists", (done) => {
-      chai
-        .request(app)
-        .post(`/api/user/`)
-        .auth(generatedToken, { type: "bearer" })
-        .send({
-          firstName: "John",
-          lastName: "Doe",
-          street: "Lovensdijkstraat 61",
-          city: "Breda",
-          password: "secret2555",
-          emailAdress: "j.doe@server.com",
-        })
-        .end((err, res) => {
-          res.should.be.an("object");
-          res.should.have.status(409);
-          res.body.should.be.an("object").that.has.all.keys("statusCode","message");
+  it("User already exists", (done) => {
+    chai
+      .request(app)
+      .post(`/api/user/`)
+      .auth(generatedToken, { type: "bearer" })
+      .send({
+        firstName: "John",
+        lastName: "Doe",
+        street: "Lovensdijkstraat 61",
+        city: "Breda",
+        password: "secret2555",
+        emailAdress: "j.doe@server.com",
+      })
+      .end((err, res) => {
+        res.should.be.an("object");
+        res.should.have.status(409);
+        res.body.should.be
+          .an("object")
+          .that.has.all.keys("statusCode", "message");
 
-          done();
-        });
-    });
-
-    it("When a required input is missing, returns valid error", (done) => {
-      chai
-        .request(app)
-        .post("/api/user")
-        .auth(generatedToken, { type: "bearer" })
-        .send({
-          lastName: "test",
-          emailAdress: "test@test.nl",
-          password: "test",
-        })
-        .end((err, res) => {
-          res.should.be.an("object");
-          res.should.have.status(400);
-          res.body.should.be.an("object").that.has.all.keys("statusCode","message");
-          done();
-        });
-    });
-
-    it("password that does not meet the requirements", (done) => {
-      chai
-        .request(app)
-        .post("/api/user")
-        .auth(generatedToken, { type: "bearer" })
-        .send({
-          firstName: "John",
-          lastName: "Doe",
-          street: "Lovensdijkstraat 61",
-          city: "Breda",
-          password: "1",
-          emailAdress: "j.doe@server.com",
-        })
-        .end((err, res) => {
-          res.should.be.an("object");
-          res.should.have.status(400);
-          res.body.should.be.an("object").that.has.all.keys("statusCode","message");
-          done();
-        });
-    });
-
-    it("Add correct user", (done) => {
-      chai
-        .request(app)
-        .post("/api/user")
-              .auth(generatedToken, { type: "bearer" })
-        .send({
-          firstName: "John",
-          lastName: "Doe",
-          street: "Lovensdijkstraat 61",
-          city: "Breda",
-          password: "secret145",
-          emailAdress: "jmm.doe@server.com",
-        })
-        .end((err, res) => {
-          res.should.be.an("object");
-          res.should.have.status(201);
-          res.body.should.be.an("object");
-          done();
-        });
-    });
-
-    after(function(done) {
-      Database.end();
-      done();
-     });   
-  
-
+        done();
+      });
   });
 
+  it("When a required input is missing, returns valid error", (done) => {
+    chai
+      .request(app)
+      .post("/api/user")
+      .auth(generatedToken, { type: "bearer" })
+      .send({
+        lastName: "test",
+        emailAdress: "test@test.nl",
+        password: "test",
+      })
+      .end((err, res) => {
+        res.should.be.an("object");
+        res.should.have.status(400);
+        res.body.should.be
+          .an("object")
+          .that.has.all.keys("statusCode", "message");
+        done();
+      });
+  });
 
+  it("password that does not meet the requirements", (done) => {
+    chai
+      .request(app)
+      .post("/api/user")
+      .auth(generatedToken, { type: "bearer" })
+      .send({
+        firstName: "John",
+        lastName: "Doe",
+        street: "Lovensdijkstraat 61",
+        city: "Breda",
+        password: "1",
+        emailAdress: "j.doe@server.com",
+      })
+      .end((err, res) => {
+        res.should.be.an("object");
+        res.should.have.status(400);
+        res.body.should.be
+          .an("object")
+          .that.has.all.keys("statusCode", "message");
+        done();
+      });
+  });
 
-   
+  it("Add correct user", (done) => {
+    chai
+      .request(app)
+      .post("/api/user")
+      .auth(generatedToken, { type: "bearer" })
+      .send({
+        firstName: "John",
+        lastName: "Doe",
+        street: "Lovensdijkstraat 61",
+        city: "Breda",
+        password: "secret145",
+        emailAdress: "jmm.doe@server.com",
+      })
+      .end((err, res) => {
+        res.should.be.an("object");
+        res.should.have.status(201);
+        res.body.should.be.an("object");
+        done();
+      });
+  });
 
-
+  after(function (done) {
+    Database.end();
+    done();
+  });
+});

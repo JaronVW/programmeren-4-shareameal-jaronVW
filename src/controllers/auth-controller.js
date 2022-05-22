@@ -4,7 +4,7 @@ const { validationResult } = require("express-validator");
 
 const JWT = require("jsonwebtoken");
 require("dotenv").config();
-const privateKey =  "test";;
+const privateKey = "test";
 
 const bcrypt = require("bcrypt");
 
@@ -28,7 +28,7 @@ const controller = {
         password != null,
         "emailaddress/password must be provided in request"
       );
-      
+
       assert(typeof emailaddress == "string", "Emailaddress must be a string");
       assert.match(emailaddress, emailRegex, "Email address must be valid");
       assert(typeof password == "string", "password must be a string");
@@ -37,7 +37,7 @@ const controller = {
       // console.log(err);
       res.status(400).json({
         statusCode: 400,
-        message: err.message
+        message: err.message,
       });
     }
   },
@@ -69,7 +69,6 @@ const controller = {
       });
     }
   },
-
 
   login: (req, res) => {
     const { emailaddress, password } = req.body;

@@ -5,7 +5,6 @@ const app = require("../../src/index");
 require("dotenv").config();
 let mysql = require("mysql2");
 
-
 const Database = mysql.createConnection({
   connectionLimit: 10,
   host: process.env.DB_HOST,
@@ -13,7 +12,7 @@ const Database = mysql.createConnection({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
-  multipleStatements: true
+  multipleStatements: true,
 });
 const { describe, it, beforeEach } = require("mocha");
 const { should } = require("chai");
@@ -21,7 +20,7 @@ const JWT = require("jsonwebtoken");
 
 require("dotenv").config();
 let generatedToken = "";
-const privateKey =  "test";;
+const privateKey = "test";
 let addedUser = 0;
 
 chai.should();
@@ -42,13 +41,13 @@ describe("Delete meal", () => {
       "INSERT INTO `user` (`id`, `firstName`, `lastName`, `isActive`, `emailAdress`, `password`, `phoneNumber`, `roles`, `street`, `city`) VALUES (500, 'John', 'Doe', '1', 'j.doe@server.com', '$2b$10$BLw0vofUcGyP3vrEcsNK7.LLDUU2HszuRFVtCtkzZ/xtJXDHks6o2', NULL, 'editor,guest', 'Lovensdijkstraat 61', 'Breda'); SELECT * FROM `user` WHERE id = LAST_INSERT_ID()"
     );
     await promisePool.query(
-        "INSERT INTO `user` (`id`, `firstName`, `lastName`, `isActive`, `emailAdress`, `password`, `phoneNumber`, `roles`, `street`, `city`) VALUES (501, 'John', 'Doe', '1', 'm.doe@server.com', '$2b$10$BLw0vofUcGyP3vrEcsNK7.LLDUU2HszuRFVtCtkzZ/xtJXDHks6o2', NULL, 'editor,guest', 'Lovensdijkstraat 61', 'Breda'); SELECT * FROM `user` WHERE id = LAST_INSERT_ID()"
+      "INSERT INTO `user` (`id`, `firstName`, `lastName`, `isActive`, `emailAdress`, `password`, `phoneNumber`, `roles`, `street`, `city`) VALUES (501, 'John', 'Doe', '1', 'm.doe@server.com', '$2b$10$BLw0vofUcGyP3vrEcsNK7.LLDUU2HszuRFVtCtkzZ/xtJXDHks6o2', NULL, 'editor,guest', 'Lovensdijkstraat 61', 'Breda'); SELECT * FROM `user` WHERE id = LAST_INSERT_ID()"
     );
     await promisePool.query(
       "INSERT INTO `meal` (`id`, `isActive`, `isVega`, `isVegan`, `isToTakeHome`, `dateTime`, `maxAmountOfParticipants`, `price`, `imageUrl`, `cookId`, `createDate`, `updateDate`, `name`, `description`, `allergenes`) VALUES (10, '1', '0', '0', '1', '2022-05-17 09:27:39', '6', '6.75', 'https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg', '500', '2022-05-21 20:38:40.932000', '2022-05-21 20:38:40.932000', 'Lasagne', 'Dé pastaklassieker bij uitstek.', '') "
     );
     await promisePool.query(
-        "INSERT INTO `meal` (`id`, `isActive`, `isVega`, `isVegan`, `isToTakeHome`, `dateTime`, `maxAmountOfParticipants`, `price`, `imageUrl`, `cookId`, `createDate`, `updateDate`, `name`, `description`, `allergenes`) VALUES (11, '1', '0', '0', '1', '2022-05-17 09:27:39', '6', '6.75', 'https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg', '501', '2022-05-21 20:38:40.932000', '2022-05-21 20:38:40.932000', 'Lasagne', 'Dé pastaklassieker bij uitstek.', '') "
+      "INSERT INTO `meal` (`id`, `isActive`, `isVega`, `isVegan`, `isToTakeHome`, `dateTime`, `maxAmountOfParticipants`, `price`, `imageUrl`, `cookId`, `createDate`, `updateDate`, `name`, `description`, `allergenes`) VALUES (11, '1', '0', '0', '1', '2022-05-17 09:27:39', '6', '6.75', 'https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg', '501', '2022-05-21 20:38:40.932000', '2022-05-21 20:38:40.932000', 'Lasagne', 'Dé pastaklassieker bij uitstek.', '') "
     );
     addedUser = rows[1];
   });
@@ -63,7 +62,7 @@ describe("Delete meal", () => {
         res.should.have.status(200);
         res.body.should.be
           .an("object")
-          .that.has.all.keys("statusCode","message");
+          .that.has.all.keys("statusCode", "message");
         done();
       });
   });
@@ -78,7 +77,7 @@ describe("Delete meal", () => {
         res.should.have.status(404);
         res.body.should.be
           .an("object")
-          .that.has.all.keys("statusCode","message");
+          .that.has.all.keys("statusCode", "message");
         done();
       });
   });
@@ -93,7 +92,7 @@ describe("Delete meal", () => {
         res.should.have.status(403);
         res.body.should.be
           .an("object")
-          .that.has.all.keys("statusCode","message");
+          .that.has.all.keys("statusCode", "message");
         done();
       });
   });
@@ -107,16 +106,13 @@ describe("Delete meal", () => {
         res.should.have.status(401);
         res.body.should.be
           .an("object")
-          .that.has.all.keys("statusCode","message");
+          .that.has.all.keys("statusCode", "message");
         done();
       });
   });
 
-  after(function(done) {
+  after(function (done) {
     Database.end();
     done();
-   });  
-  
-
-
+  });
 });

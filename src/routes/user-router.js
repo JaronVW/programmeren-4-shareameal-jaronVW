@@ -15,16 +15,12 @@ router.post("/", validateUser, addUser);
 
 router.get("/profile", validateToken, getUserProfile);
 
-router.get("/:userId",validateToken, getUserById);
+router.get("/:userId", validateToken, getUserById);
 
 router.put("/:userId", validateToken, validateUser, editUser);
 
 router.delete("/:userId", validateToken, deleteUser);
 
 router.get("/", validateToken, getUsers);
-
-
-
-
 
 module.exports = router;

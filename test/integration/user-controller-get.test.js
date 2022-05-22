@@ -5,7 +5,6 @@ const app = require("../../src/index");
 require("dotenv").config();
 let mysql = require("mysql2");
 
-
 const Database = mysql.createConnection({
   connectionLimit: 10,
   host: process.env.DB_HOST,
@@ -13,7 +12,7 @@ const Database = mysql.createConnection({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
-  multipleStatements: true
+  multipleStatements: true,
 });
 const { describe, it, beforeEach } = require("mocha");
 const { should } = require("chai");
@@ -21,7 +20,7 @@ const JWT = require("jsonwebtoken");
 
 require("dotenv").config();
 let generatedToken = "";
-const privateKey =  "test";;
+const privateKey = "test";
 let addedUser = 0;
 
 chai.should();
@@ -31,7 +30,6 @@ JWT.sign({ userId: 500 }, privateKey, { expiresIn: "1y" }, (err, token) => {
   if (err) console.log(err);
   generatedToken = token;
 });
-
 
 describe("Get users", () => {
   beforeEach(async () => {
@@ -72,7 +70,7 @@ describe("Get users", () => {
         done();
       });
   });
-  
+
   it("search name that does not exist", (done) => {
     chai
       .request(app)
@@ -137,7 +135,9 @@ describe("Get users", () => {
         res.should.be.an("object");
         // console.log(res.Message);
         res.should.have.status(401);
-        res.body.should.be.an("object").that.has.all.keys("statusCode","message");
+        res.body.should.be
+          .an("object")
+          .that.has.all.keys("statusCode", "message");
         done();
       });
   });
@@ -223,10 +223,8 @@ describe("Get users", () => {
       });
   });
 
-  after(function(done) {
+  after(function (done) {
     Database.end();
     done();
-   }); 
-  
-  
+  });
 });
