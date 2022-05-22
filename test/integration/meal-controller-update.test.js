@@ -99,7 +99,7 @@ describe("Update meal", () => {
       })
       .end((err, res) => {
         res.should.be.an("object");
-        res.should.have.status(400);
+        res.should.have.status(403);
         res.body.should.be
           .an("object")
           .that.has.all.keys("statusCode", "message");
@@ -139,7 +139,7 @@ describe("Update meal", () => {
   it("Succesfull edit", (done) => {
     chai
       .request(app)
-      .put("/api/meal/100000")
+      .put("/api/meal/10")
       .auth(generatedToken, { type: "bearer" })
       .send({
         name: "Spaghetti saus",
@@ -157,10 +157,10 @@ describe("Update meal", () => {
       })
       .end((err, res) => {
         res.should.be.an("object");
-        res.should.have.status(400);
+        res.should.have.status(200);
         res.body.should.be
           .an("object")
-          .that.has.all.keys("statusCode", "message");
+          .that.has.all.keys("result");
         done();
       });
   });

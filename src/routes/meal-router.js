@@ -16,7 +16,7 @@ router.get("/:mealId", validateToken,  getMealById);
 
 router.post("/", validateToken, validateMeal, addMeal);
 
-router.put("/:mealId", validateToken, updateMealById);
+router.put("/:mealId", validateToken, validateMeal, updateMealById);
 
 router.delete("/:mealId", validateToken, deleteMealById);
 

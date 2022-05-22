@@ -161,18 +161,65 @@ const controller = {
   updateMealById: (req, res) => {
     if (typeof req.jwtUserId !== "undefined") {
       const mealId = req.params.mealId;
+      const meal = req.body;
       Database.query(
-        "SELECT * FROM meal WHERE id = ?",
-        [mealId],
+        "SELECT id FROM meal WHERE id = ?; SELECT id, cookId FROM meal WHERE id = ? AND cookId = ?",
+        [mealId, mealId, req.jwtUserId],
         (err, rows, fields) => {
-          if (err) {
-            console.log(err);
-            res.status(400).json({
-              statusCode: 400,
-              message: `Something went wrong`,
-            });
+          if (rows[0].length !== 0) {
+            if (rows[1].length !== 0) {
+              if (err) {
+                res.status(400).json({
+                  statusCode: 400,
+                  message: `Something went wrong`,
+                });
+              }
+              const date = new Date()
+                .toISOString()
+                .slice(0, 19)
+                .replace("T", " ");
+              allergenesString = meal.allergenes.toString();
+              Database.query(
+                "UPDATE `meal` SET `isActive`=?,`isVega`=?,`isVegan`=?,`isToTakeHome`=?,`maxAmountOfParticipants`=?,`price`=?,`imageUrl`=?,`cookId`=?,`updateDate`=?,`name`=?,`description`=?,`allergenes` =? WHERE id = ?",
+                [
+                  meal.isActive,
+                  meal.isVega,
+                  meal.isVegan,
+                  meal.isToTakeHome,
+                  meal.maxAmountOfParticipants,
+                  meal.price,
+                  meal.imageUrl,
+                  req.jwtUserId,
+                  date,
+                  meal.name,
+                  meal.description,
+                  allergenesString,
+                  mealId,
+                ],
+                (err, rows, fields) => {
+                  if (err) {
+                    console.log(err);
+                    res.status(400).json({
+                      statusCode: 400,
+                      message: `Something went wrong`,
+                    });
+                  } else {
+                    res.status(200).json({ result: req.body });
+                    return;
+                  }
+                }
+              );
+            } else {
+              res.status(403).json({
+                statusCode: 401,
+                message: `Unauthorized`,
+              });
+            }
           } else {
-            res.send(rows);
+            res.status(404).json({
+              statusCode: 404,
+              message: `Meal not found`,
+            });
           }
         }
       );
