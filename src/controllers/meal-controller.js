@@ -11,7 +11,7 @@ const controller = {
           message: `Something went wrong`,
         });
       } else {
-        res.status(200).json({result: rows});
+        res.status(200).json({ result: rows });
       }
     });
   },
@@ -35,7 +35,7 @@ const controller = {
               message: `Meal not found`,
             });
           } else {
-            res.send({result: rows});
+            res.send({ result: rows });
           }
         }
       }
@@ -108,7 +108,7 @@ const controller = {
         message: `Not logged in`,
       });
     } else {
-      const date = new Date().toISOString();
+      const date = new Date().toISOString().slice(0, 19).replace("T", " ");
       Database.query(
         "INSERT INTO `meal`(`isActive`, `isVega`, `isVegan`, `isToTakeHome`, `dateTime`, `maxAmountOfParticipants`, `price`, `imageUrl`, `cookId`, `createDate`, `updateDate`, `name`, `description`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?); SELECT  * from `meal` WHERE id = LAST_INSERT_ID();",
         [
@@ -146,22 +146,22 @@ const controller = {
 
   updateMealById: (req, res) => {
     if (typeof req.jwtUserId !== "undefined") {
-    const mealId = req.params.mealId;
-    Database.query(
-      "SELECT * FROM meal WHERE id = ?",
-      [mealId],
-      (err, rows, fields) => {
-        if (err) {
-          console.log(err);
-          res.status(400).json({
-            statusCode: 400,
-            message: `Something went wrong`,
-          });
-        } else {
-          res.send(rows);
+      const mealId = req.params.mealId;
+      Database.query(
+        "SELECT * FROM meal WHERE id = ?",
+        [mealId],
+        (err, rows, fields) => {
+          if (err) {
+            console.log(err);
+            res.status(400).json({
+              statusCode: 400,
+              message: `Something went wrong`,
+            });
+          } else {
+            res.send(rows);
+          }
         }
-      }
-    ); 
+      );
     } else {
       res.status(400).json({
         statusCode: 400,
@@ -182,7 +182,6 @@ const controller = {
         "SELECT cookId FROM meal WHERE id = ?; SELECT cookId FROM meal WHERE id = ? AND cookId = ?",
         [mealId, mealId, req.jwtUserId],
         (err, rows, fields) => {
-
           if (err) {
             console.log(err);
             res.status(400).json({
