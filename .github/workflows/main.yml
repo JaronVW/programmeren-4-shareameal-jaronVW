@@ -39,6 +39,8 @@ jobs:
             - name: npm test
               run: |
                   npm test -- --DB_PASSWORD $MYSQL_ROOT_PASSWORD --DB_USER root --DB_NAME $DB_DATABASE
+              run: |
+                  sudo /etc/init.d/mysql stop
     deploy:
         needs: integrationtests
         runs-on: ubuntu-latest
