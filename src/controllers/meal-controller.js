@@ -3,25 +3,13 @@ const assert = require("assert");
 
 const controller = {
   getAllMeals: (req, res) => {
-    Database.query("SELECT * FROM meal", (err, rows, fields) => {
-      if (err) {
-        console.log(err);
-        res.status(400).json({
-          statusCode: 400,
-          message: `Something went wrong`,
-        });
-      } else {
-        res.status(200).json({ result: rows });
-      }
-    });
-  },
-
-  getMealById: (req, res) => {
-    const mealId = req.params.mealId;
-    Database.query(
-      "SELECT * FROM meal WHERE id = ?",
-      [mealId],
-      (err, rows, fields) => {
+    if (typeof req.jwtUserId === "undefined") {
+      res.status(400).json({
+        statusCode: 400,
+        message: `Not logged in`,
+      });
+    } else {
+      Database.query("SELECT * FROM meal", (err, rows, fields) => {
         if (err) {
           console.log(err);
           res.status(400).json({
@@ -29,17 +17,43 @@ const controller = {
             message: `Something went wrong`,
           });
         } else {
-          if (rows.length == 0) {
-            res.status(404).json({
-              statusCode: 404,
-              message: `Meal not found`,
+          res.status(200).json({ result: rows });
+        }
+      });
+    }
+  },
+
+  getMealById: (req, res) => {
+    if (typeof req.jwtUserId === "undefined") {
+      res.status(400).json({
+        statusCode: 400,
+        message: `Not logged in`,
+      });
+    } else {
+      const mealId = req.params.mealId;
+      Database.query(
+        "SELECT * FROM meal WHERE id = ?",
+        [mealId],
+        (err, rows, fields) => {
+          if (err) {
+            console.log(err);
+            res.status(400).json({
+              statusCode: 400,
+              message: `Something went wrong`,
             });
           } else {
-            res.send({ result: rows });
+            if (rows.length == 0) {
+              res.status(404).json({
+                statusCode: 404,
+                message: `Meal not found`,
+              });
+            } else {
+              res.send({ result: rows });
+            }
           }
         }
-      }
-    );
+      );
+    }
   },
 
   validateMeal: (req, res, next) => {
